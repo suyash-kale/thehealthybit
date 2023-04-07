@@ -4,7 +4,27 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "postinstall": "npm install --prefix ./packages/server && npm install --prefix ./packages/client",
+    "prepare": "husky install",
+    "start": "npm run start --prefix ./packages/server",
+    "cz": "cz",
+    "lint": "lerna run lint",
+    "prettier": "lerna run prettier",
+    "semantic-release": "semantic-release"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
   "devDependencies": {
-    "lerna": "^6.5.1"
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.7",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^8.0.3",
+    "lerna": "^6.5.1",
+    "semantic-release": "^21.0.1"
   }
 }

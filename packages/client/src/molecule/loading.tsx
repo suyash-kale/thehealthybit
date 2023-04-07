@@ -9,6 +9,7 @@ const Container = styled(Box)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
 }));
 
+// higher order component for displaying loading progress.
 const Progress = styled(LinearProgress)(() => ({
   position: 'absolute',
   width: '100%',

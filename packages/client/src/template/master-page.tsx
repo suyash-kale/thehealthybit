@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 import {
   Toolbar,
   IconButton,
@@ -23,6 +23,8 @@ import {
   Menu as MenuIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
+import { FormattedMessage } from 'react-intl';
+import { useUser } from '../hooks/use-user';
 
 interface MasterPageType {
   role?: string;
@@ -88,17 +90,22 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 export const MasterPage: FC<MasterPageType> = ({ children }) => {
-  const user = false;
+  const { isSignIn, signOut } = useUser();
 
   const [open, setOpen] = React.useState(true);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+  const onSignOut = useCallback(() => {
+    signOut();
+    setAnchorEl(null);
+  }, []);
+
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBarStyled position="fixed">
         <Toolbar variant="dense">
-          {user && (
+          {isSignIn && (
             <IconButton
               color="inherit"
               onClick={() => setOpen((b) => !b)}
@@ -111,9 +118,9 @@ export const MasterPage: FC<MasterPageType> = ({ children }) => {
             </IconButton>
           )}
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            The Healthy Bit
+            <FormattedMessage id="APP-NAME" />
           </Typography>
-          {user ? (
+          {isSignIn ? (
             <>
               <IconButton
                 color="inherit"
@@ -134,6 +141,7 @@ export const MasterPage: FC<MasterPageType> = ({ children }) => {
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
+                onClick={onSignOut}
                 keepMounted
               >
                 <MenuItem>Sign out</MenuItem>
@@ -141,13 +149,17 @@ export const MasterPage: FC<MasterPageType> = ({ children }) => {
             </>
           ) : (
             <>
-              <Button color="inherit">Sign in</Button>
-              <Button color="inherit">Sign up</Button>
+              <Button color="inherit">
+                <FormattedMessage id="SIGN-IN" />
+              </Button>
+              <Button color="inherit">
+                <FormattedMessage id="SIGN-UP" />
+              </Button>
             </>
           )}
         </Toolbar>
       </AppBarStyled>
-      {user && (
+      {isSignIn && (
         <DrawerStyled variant="permanent" open={open}>
           <DrawerHeader />
           <Divider />

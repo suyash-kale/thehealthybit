@@ -6,11 +6,13 @@ import { NotificationType } from '../types/notification';
 import { NotificationState } from '../state/notification';
 import { useNotification } from '../hooks/use-notification';
 
+// notification component.
 export const Notification: FC = () => {
   const notifications = useRecoilValue(NotificationState);
 
   const { removeNotification } = useNotification();
 
+  // handling close event for notification.
   const onClose = useCallback(
     (notification: NotificationType, reason?: string) => {
       if (reason === 'clickaway') {

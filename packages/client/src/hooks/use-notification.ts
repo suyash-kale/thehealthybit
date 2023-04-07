@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useIntl } from 'react-intl';
 import { useSetRecoilState } from 'recoil';
 
 import { NotificationType } from '../types/notification';
@@ -12,20 +13,28 @@ interface UseNotificationReturn {
   removeNotification: (Id: NotificationType['Id']) => void;
 }
 
+// handling application notification.
 export const useNotification = (): UseNotificationReturn => {
+  const { formatMessage } = useIntl();
+
   const setNotification = useSetRecoilState(NotificationState);
 
+  // add notification.
   const addNotification = useCallback(
     (data: Omit<NotificationType, 'Id'>): number => {
       const Id = generateRandomNumber();
       setNotification((prev) => {
-        return [...prev, { Id, ...data }];
+        return [
+          ...prev,
+          { ...data, Id, message: formatMessage({ id: data.message }) },
+        ];
       });
       return Id;
     },
     [],
   );
 
+  // remove notification.
   const removeNotification = useCallback((Id: NotificationType['Id']) => {
     setNotification((prev) => prev.filter((item) => item.Id !== Id));
   }, []);

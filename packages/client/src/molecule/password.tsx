@@ -16,6 +16,7 @@ import {
   VisibilityOff as VisibilityOffIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import generateRandomNumber from '../utility/generate-random-number';
 
@@ -28,6 +29,7 @@ export type PasswordProps<T extends FieldValues, P extends keyof T> = {
   formHelperText?: FormHelperTextProps;
 } & OutlinedInputProps;
 
+// password input field component.
 export const Password = <T extends FieldValues, P extends keyof T>({
   form,
   registered,
@@ -37,8 +39,12 @@ export const Password = <T extends FieldValues, P extends keyof T>({
   formHelperText,
   ...props
 }: PasswordProps<T, P>) => {
+  const { formatMessage } = useIntl();
+
+  // generate random id for input field.
   const Id = `id-${generateRandomNumber()}`;
 
+  // state for toggling password visibility.
   const [show, setShow] = useState<boolean>(false);
 
   const { formState, register, setValue } = form;
@@ -46,6 +52,8 @@ export const Password = <T extends FieldValues, P extends keyof T>({
   const { errors, dirtyFields } = formState;
 
   const isFormDirty = formState.submitCount > 0;
+
+  const helperText = errors[registered]?.message?.toString();
 
   return (
     <FormControl
@@ -55,7 +63,11 @@ export const Password = <T extends FieldValues, P extends keyof T>({
       {...formControl}
     >
       <InputLabel error={!!errors[registered]} {...inputLabel} htmlFor={Id}>
-        {props.label}
+        {typeof props.label === 'string' ? (
+          <FormattedMessage id={props.label} />
+        ) : (
+          props.label
+        )}
       </InputLabel>
       <OutlinedInput
         {...props}
@@ -80,9 +92,10 @@ export const Password = <T extends FieldValues, P extends keyof T>({
             shouldDirty: true,
           });
         }}
+        placeholder={formatMessage({ id: props.placeholder })}
       />
       <FormHelperText error={!!errors[registered]} {...formHelperText}>
-        {errors[registered]?.message?.toString()}
+        {helperText && <FormattedMessage id={helperText} />}
       </FormHelperText>
     </FormControl>
   );
