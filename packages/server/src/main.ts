@@ -41,6 +41,11 @@ async function main() {
   // other static files for the application.
   app.use(express.static(path.join(__dirname, '../public')));
 
+  // making sure the react client application routes are served.
+  app.get('/*', (_req, res) =>
+    res.sendFile(path.join(__dirname, '../../client/dist/index.html')),
+  );
+
   app.listen(ENV.PORT, () => {
     console.log(`Listening on http://localhost:${ENV.PORT}`);
   });
