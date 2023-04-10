@@ -10,22 +10,20 @@ import { PageMessage } from './atom/page-message';
 import { useUser } from './hooks/use-user';
 
 export const Pages: FC = () => {
-  const { isSignIn, signIn } = useUser();
+  const { isSignIn, reSignIn } = useUser();
 
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const main = async () => {
-      const authorization = localStorage.getItem('authorization');
-      if (authorization && !isSignIn) {
-        await signIn(authorization);
-        setLoading(false);
-      } else {
-        setLoading(false);
+      // is case user agreed to remember me, will try to re-sign in.
+      if (!isSignIn) {
+        await reSignIn();
       }
+      setLoading(false);
     };
     main();
-  }, [isSignIn]);
+  }, [isSignIn, reSignIn]);
 
   return (
     <BrowserRouter>
