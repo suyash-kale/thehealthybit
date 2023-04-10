@@ -3,6 +3,7 @@ import { useRecoilState } from 'recoil';
 
 import { client } from '../utility/trpc';
 import { UserState } from '../state/user';
+import { UserType } from '../types/user';
 
 export const useUser = () => {
   const [user, setUser] = useRecoilState(UserState);
@@ -16,44 +17,41 @@ export const useUser = () => {
   }, [user]);
 
   // handling user sign in.
-  const signIn = useCallback(async (authorization: string) => {
-    // save authorization in local storage.
-    localStorage.setItem('authorization', authorization);
-
-    // get user information on basis of authorization token.
-    try {
-      const {
-        mobile,
-        detail: { first, last, email },
-      } = await client.user.me.query();
-
-      // setting user information.
-      const u = {
-        first,
-        last,
-        mobile,
-        email,
-        authorization,
-      };
+  const signIn = useCallback(
+    (u: UserType) => {
+      localStorage.setItem('authorization', u.authorization);
       setUser(u);
+    },
+    [setUser],
+  );
 
-      return u;
-    } catch (_) {
-      // handling error in sign in.
-      localStorage.removeItem('authorization');
+  // handling user sign in.
+  const reSignIn = useCallback(async () => {
+    // will try to re-sign in the user if the authorization token is present.
+    if (localStorage.getItem('authorization')) {
+      try {
+        // trying to get user information on basis of authorization token.
+        const u = await client.user.me.query();
+        signIn(u);
+        return u;
+      } catch (_) {
+        // handling error in sign in.
+        localStorage.removeItem('authorization');
+      }
     }
-  }, []);
+  }, [signIn]);
 
   // handling user sign out.
   const signOut = useCallback(() => {
     localStorage.removeItem('authorization');
     setUser(null);
-  }, []);
+  }, [setUser]);
 
   return {
     isSignIn,
     isAuth,
     signIn,
+    reSignIn,
     signOut,
   };
 };

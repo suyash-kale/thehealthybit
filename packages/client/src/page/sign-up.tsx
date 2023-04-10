@@ -64,12 +64,13 @@ export const SignUp: FC = () => {
   // handle sign in form submission.
   const onSuccess = useCallback(async (data: SchemaType) => {
     setLoading(true);
+
     try {
-      // sign up user.
+      // firing sign up mutation.
       const response = await client.user.signUp.mutate(data);
 
-      // getting user information.
-      const user = await signIn(response.authorization);
+      // sign in user.
+      signIn(response);
 
       addNotification({
         severity: 'success',
@@ -77,7 +78,7 @@ export const SignUp: FC = () => {
           {
             id: 'WELCOME-NAME',
           },
-          { name: user?.first },
+          { name: response.first },
         ),
       });
 
