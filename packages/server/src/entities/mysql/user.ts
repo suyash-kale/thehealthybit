@@ -1,5 +1,7 @@
 import {
+  AfterLoad,
   BaseEntity,
+  BeforeInsert,
   Column,
   Entity,
   OneToOne,
@@ -7,6 +9,7 @@ import {
   Relation,
 } from 'typeorm';
 
+import { encrypt, decrypt } from '../../utility/crypto';
 import { UserDetail } from './user-detail';
 
 // base user information.
@@ -29,6 +32,18 @@ export class User extends BaseEntity {
 
   @Column('boolean')
   active = true;
+
+  // encrypting mobile number before saving it in database.
+  @BeforeInsert()
+  beforeInsert() {
+    this.mobile = encrypt(this.mobile);
+  }
+
+  // decrypting mobile number after fetching it from database.
+  @AfterLoad()
+  afterLoad() {
+    this.mobile = decrypt(this.mobile);
+  }
 
   // relationships.
 
