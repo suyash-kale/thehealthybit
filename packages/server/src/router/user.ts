@@ -1,8 +1,7 @@
 import z from 'zod';
 
-import { User } from '../entities/mysql/user';
 import { router, procedurePubic, procedurePrivate } from '../utility/trpc';
-import { SessionType, userService } from '../services/user';
+import { UserType, userService } from '../services/user';
 
 // user router.
 export const userRouter = router({
@@ -30,7 +29,7 @@ export const userRouter = router({
           .max(20, { message: 'TOO-LONG' }),
       }),
     )
-    .mutation<SessionType>(async ({ input }) => userService.signUp(input)),
+    .mutation<UserType>(async ({ input }) => userService.signUp(input)),
 
   // signing in user.
   signIn: procedurePubic
@@ -46,8 +45,10 @@ export const userRouter = router({
           .max(20, { message: 'TOO_LONG' }),
       }),
     )
-    .mutation<SessionType>(async ({ input }) => userService.signIn(input)),
+    .mutation<UserType>(async ({ input }) => userService.signIn(input)),
 
   // getting user profile.
-  me: procedurePrivate.query<User>(async ({ ctx: { user } }) => user),
+  me: procedurePrivate.query<UserType>(async ({ ctx: { user } }) =>
+    userService.me(user),
+  ),
 });
