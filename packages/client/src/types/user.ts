@@ -1,7 +1,1 @@
-export interface UserType {
-  first: string;
-  last?: string;
-  mobile: string;
-  email?: string;
-  authorization: string;
-}
+export type { UserType } from '../../../server/src/services/user';
