@@ -114,7 +114,7 @@ export const SignUp: FC = () => {
         >
           <form onSubmit={handleSubmit(onSuccess, onError)} noValidate>
             <Grid container>
-              <Grid item md={6} sm={12} sx={{ pr: 1 }}>
+              <Grid item md={6} xs={12} pr={{ md: 1 }}>
                 <TextField
                   form={form}
                   registered="first"
@@ -129,7 +129,7 @@ export const SignUp: FC = () => {
                   autoFocus
                 />
               </Grid>
-              <Grid item md={6} sm={12} sx={{ pl: 1 }}>
+              <Grid item md={6} xs={12} pl={{ md: 1 }}>
                 <TextField
                   form={form}
                   registered="last"
@@ -142,7 +142,7 @@ export const SignUp: FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item sm={12}>
+              <Grid item xs={12}>
                 <TextField
                   form={form}
                   registered="mobile"
@@ -157,7 +157,7 @@ export const SignUp: FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item sm={12}>
+              <Grid item xs={12}>
                 <TextField
                   form={form}
                   registered="email"
@@ -171,7 +171,7 @@ export const SignUp: FC = () => {
                   type="email"
                 />
               </Grid>
-              <Grid item sm={12}>
+              <Grid item xs={12}>
                 <Password
                   form={form}
                   registered="password"
@@ -187,7 +187,7 @@ export const SignUp: FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item sm={12} textAlign="right">
+              <Grid item xs={12} textAlign="right">
                 <LoadingButton
                   type="submit"
                   variant="contained"
