@@ -6,6 +6,7 @@ import { User } from '../entities/mysql/user';
 import { UserDetail } from '../entities/mysql/user-detail';
 import { sign, verify } from '../utility/jwt';
 import { userDetailService } from './user-detail';
+import { encrypt } from '../utility/crypto';
 
 // parameters for signing up new user.
 interface SignUpParams {
@@ -42,7 +43,7 @@ class UserService {
     const { mobile, first, last, email } = data;
 
     // checking mobile is already registered.
-    if (await User.findOne({ where: { mobile } })) {
+    if (await User.findOne({ where: { mobile: encrypt(mobile) } })) {
       throw new TRPCError({
         code: 'PRECONDITION_FAILED',
         message: 'MOBILE-ALREADY-REGISTERED',
@@ -86,7 +87,7 @@ class UserService {
   async signIn({ mobile, password }: SignInParams): Promise<UserType> {
     // loading user with the mobile number.
     const user = await User.findOne({
-      where: { mobile },
+      where: { mobile: encrypt(mobile) },
     });
 
     // check if mobile is registered.
@@ -119,7 +120,7 @@ class UserService {
     });
 
     if (!user) {
-      throw new Error('Unable to fetch you information.');
+      throw new Error();
     }
 
     const authorization = this.getAuthorization(data);

@@ -12,8 +12,14 @@ export const userRouter = router({
         first: z
           .string()
           .min(1, { message: 'REQUIRED' })
+          .min(2, { message: 'TOO-SHORT' })
           .max(20, { message: 'TOO-LONG' }),
-        last: z.string().max(20, { message: 'TOO-LONG' }),
+        last: z
+          .string()
+          .min(2, { message: 'TOO-SHORT' })
+          .max(20, { message: 'TOO-LONG' })
+          .optional()
+          .or(z.literal('')),
         mobile: z
           .string()
           .min(10, { message: 'INVALID-MOBILE' })
@@ -25,6 +31,7 @@ export const userRouter = router({
           .or(z.literal('')),
         password: z
           .string()
+          .min(1, { message: 'REQUIRED' })
           .min(6, { message: 'TOO-SHORT' })
           .max(20, { message: 'TOO-LONG' }),
       }),
@@ -37,12 +44,14 @@ export const userRouter = router({
       z.object({
         mobile: z
           .string()
-          .min(10, { message: 'INVALID_MOBILE' })
-          .max(10, { message: 'INVALID_MOBILE' }),
+          .min(1, { message: 'REQUIRED' })
+          .min(10, { message: 'INVALID-MOBILE' })
+          .max(10, { message: 'INVALID-MOBILE' }),
         password: z
           .string()
-          .min(6, { message: 'TOO_SHORT' })
-          .max(20, { message: 'TOO_LONG' }),
+          .min(1, { message: 'REQUIRED' })
+          .min(6, { message: 'TOO-SHORT' })
+          .max(20, { message: 'TOO-LONG' }),
       }),
     )
     .mutation<UserType>(async ({ input }) => userService.signIn(input)),
