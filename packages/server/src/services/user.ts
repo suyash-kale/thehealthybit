@@ -6,6 +6,7 @@ import { User } from '../entities/mysql/user';
 import { UserDetail } from '../entities/mysql/user-detail';
 import { sign, verify } from '../utility/jwt';
 import { userDetailService } from './user-detail';
+import { encrypt } from '../utility/crypto';
 
 // parameters for signing up new user.
 interface SignUpParams {
@@ -23,7 +24,11 @@ interface SignInParams {
 }
 
 // client session type for user.
-export interface SessionType extends Record<string, unknown> {
+export interface UserType {
+  first: UserDetail['first'];
+  last?: UserDetail['last'];
+  mobile: User['mobile'];
+  email?: UserDetail['email'];
   authorization: string;
 }
 
@@ -34,11 +39,11 @@ interface SessionUserType extends Record<string, unknown> {
 // manipulating user.
 class UserService {
   // signing up new user.
-  async signUp(data: SignUpParams): Promise<SessionType> {
+  async signUp(data: SignUpParams): Promise<UserType> {
     const { mobile, first, last, email } = data;
 
     // checking mobile is already registered.
-    if (await User.findOne({ where: { mobile } })) {
+    if (await User.findOne({ where: { mobile: encrypt(mobile) } })) {
       throw new TRPCError({
         code: 'PRECONDITION_FAILED',
         message: 'MOBILE-ALREADY-REGISTERED',
@@ -62,12 +67,8 @@ class UserService {
     userDetail.user = user;
     await userDetailService.create(userDetail);
 
-    // generating authorization token for user session.
-    const authorization = this.getAuthorization({ id: user.id });
-
-    return {
-      authorization,
-    };
+    // returning signed up user information.
+    return this.me({ id: user.id });
   }
 
   // generating authorization token for user session from user id.
@@ -75,11 +76,18 @@ class UserService {
     return sign(data);
   }
 
+  // decoding authorization token for user session.
+  decodeAuthorization(
+    authorization: UserType['authorization'],
+  ): Promise<SessionUserType> {
+    return verify<SessionUserType>(authorization);
+  }
+
   // signing in user through mobile and password.
-  async signIn({ mobile, password }: SignInParams): Promise<SessionType> {
+  async signIn({ mobile, password }: SignInParams): Promise<UserType> {
     // loading user with the mobile number.
     const user = await User.findOne({
-      where: { mobile },
+      where: { mobile: encrypt(mobile) },
     });
 
     // check if mobile is registered.
@@ -98,25 +106,32 @@ class UserService {
       });
     }
 
-    // generating authorization token for user session.
-    const authorization = this.getAuthorization({ id: user.id });
-
-    return {
-      authorization,
-    };
+    // returning signed in user information.
+    return this.me({ id: user.id });
   }
 
   // get user information from session authorization token.
-  async me(authorization: SessionType['authorization']): Promise<User> {
-    const { id } = await verify<SessionUserType>(authorization);
+  async me(data: SessionUserType): Promise<UserType> {
+    const { id } = data;
+
     const user = await User.findOne({
       where: { id },
       relations: ['detail'],
     });
+
     if (!user) {
-      throw new Error('Unable to fetch you information.');
+      throw new Error();
     }
-    return user;
+
+    const authorization = this.getAuthorization(data);
+
+    return {
+      first: user.detail.first,
+      last: user.detail.last,
+      mobile: user.mobile,
+      email: user.detail.email,
+      authorization,
+    };
   }
 }
 

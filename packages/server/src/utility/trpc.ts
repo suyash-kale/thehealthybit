@@ -17,7 +17,7 @@ export const createContext = async ({
   const authorization = req.headers.authorization;
   let user = null;
   if (authorization && typeof authorization === 'string') {
-    user = await userService.me(authorization);
+    user = await userService.decodeAuthorization(authorization);
   }
 
   return {

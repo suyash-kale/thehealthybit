@@ -2,30 +2,29 @@ import React, { FC, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 
+import { useUser } from './hooks/use-user';
+import { PageMessage } from './atom/page-message';
 import { MasterPage } from './template/master-page';
 import { PageAuth } from './atom/page-auth';
-import { Dashboard } from './page/dashboard';
 import { SignUp } from './page/sign-up';
-import { PageMessage } from './atom/page-message';
-import { useUser } from './hooks/use-user';
+import { Dashboard } from './page/dashboard';
+import { SignIn } from './page/sign-in';
 
 export const Pages: FC = () => {
-  const { isSignIn, signIn } = useUser();
+  const { isSignIn, reSignIn } = useUser();
 
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const main = async () => {
-      const authorization = localStorage.getItem('authorization');
-      if (authorization && !isSignIn) {
-        await signIn(authorization);
-        setLoading(false);
-      } else {
-        setLoading(false);
+      // is case user agreed to remember me, will try to re-sign in.
+      if (!isSignIn) {
+        await reSignIn();
       }
+      setLoading(false);
     };
     main();
-  }, [isSignIn]);
+  }, [isSignIn, reSignIn]);
 
   return (
     <BrowserRouter>
@@ -39,12 +38,13 @@ export const Pages: FC = () => {
             <Route
               path="/"
               element={
-                <PageAuth redirectIfNotAuth="/sign-up">
+                <PageAuth redirectIfNotAuth="/sign-in">
                   <Dashboard />
                 </PageAuth>
               }
             />
             <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/sign-in" element={<SignIn />} />
           </Routes>
         </MasterPage>
       )}

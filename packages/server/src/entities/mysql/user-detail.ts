@@ -1,5 +1,7 @@
 import {
+  AfterLoad,
   BaseEntity,
+  BeforeInsert,
   Column,
   Entity,
   JoinColumn,
@@ -7,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { encrypt, decrypt } from '../../utility/crypto';
 import { User } from './user';
 
 // user detail information.
@@ -29,6 +32,30 @@ export class UserDetail extends BaseEntity {
 
   @Column('datetime')
   updatedAt: Date = new Date();
+
+  // encrypting mobile number before saving it in database.
+  @BeforeInsert()
+  beforeInsert() {
+    this.first = encrypt(this.first);
+    if (this.last) {
+      this.last = encrypt(this.last);
+    }
+    if (this.email) {
+      this.email = encrypt(this.email);
+    }
+  }
+
+  // decrypting mobile number after fetching it from database.
+  @AfterLoad()
+  afterLoad() {
+    this.first = decrypt(this.first);
+    if (this.last) {
+      this.last = decrypt(this.last);
+    }
+    if (this.email) {
+      this.email = decrypt(this.email);
+    }
+  }
 
   // relationships.
 
