@@ -2,12 +2,13 @@ import React, { FC, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 
+import { useUser } from './hooks/use-user';
+import { PageMessage } from './atom/page-message';
 import { MasterPage } from './template/master-page';
 import { PageAuth } from './atom/page-auth';
-import { Dashboard } from './page/dashboard';
 import { SignUp } from './page/sign-up';
-import { PageMessage } from './atom/page-message';
-import { useUser } from './hooks/use-user';
+import { Dashboard } from './page/dashboard';
+import { SignIn } from './page/sign-in';
 
 export const Pages: FC = () => {
   const { isSignIn, reSignIn } = useUser();
@@ -37,12 +38,13 @@ export const Pages: FC = () => {
             <Route
               path="/"
               element={
-                <PageAuth redirectIfNotAuth="/sign-up">
+                <PageAuth redirectIfNotAuth="/sign-in">
                   <Dashboard />
                 </PageAuth>
               }
             />
             <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/sign-in" element={<SignIn />} />
           </Routes>
         </MasterPage>
       )}
