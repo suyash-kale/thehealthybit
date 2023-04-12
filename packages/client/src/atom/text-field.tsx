@@ -34,11 +34,6 @@ export const TextField = <T extends FieldValues, P extends Path<T>>({
       onChange={(ev) => {
         setValue(registered, ev.target.value as PathValue<T, P>, {
           shouldValidate: isFormDirty || dirtyFields[registered],
-        });
-      }}
-      onBlur={(ev) => {
-        setValue(registered, ev.target.value as PathValue<T, P>, {
-          shouldValidate: true,
           shouldDirty: true,
         });
       }}

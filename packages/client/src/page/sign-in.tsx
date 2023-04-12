@@ -1,8 +1,14 @@
-import { FC, MouseEvent, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState, ChangeEvent } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Grid, Paper, Typography } from '@mui/material';
+import {
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  Paper,
+  Typography,
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -16,28 +22,13 @@ import { client } from '../utility/trpc';
 import { useUser } from '../hooks/use-user';
 import { wait } from '../utility/wait';
 
-// schema for sign up form data.
+// schema for sign in form data.
 const schema = z.object({
-  first: z
-    .string()
-    .min(1, { message: 'REQUIRED' })
-    .min(2, { message: 'TOO-SHORT' })
-    .max(20, { message: 'TOO-LONG' }),
-  last: z
-    .string()
-    .min(2, { message: 'TOO-SHORT' })
-    .max(20, { message: 'TOO-LONG' })
-    .optional()
-    .or(z.literal('')),
   mobile: z
     .string()
+    .min(1, { message: 'REQUIRED' })
     .min(10, { message: 'INVALID-MOBILE' })
     .max(10, { message: 'INVALID-MOBILE' }),
-  email: z
-    .string()
-    .email({ message: 'INVALID-EMAIL' })
-    .optional()
-    .or(z.literal('')),
   password: z
     .string()
     .min(1, { message: 'REQUIRED' })
@@ -47,8 +38,8 @@ const schema = z.object({
 
 type SchemaType = z.infer<typeof schema>;
 
-// sign up page component.
-export const SignUp: FC = () => {
+// sign in page component.
+export const SignIn: FC = () => {
   const { formatMessage } = useIntl();
 
   const navigate = useNavigate();
@@ -60,9 +51,12 @@ export const SignUp: FC = () => {
   // loading state for the component.
   const [loading, setLoading] = useState<boolean>(false);
 
+  // remember me checkbox state.
+  const [rememberMe, setRememberMe] = useState<boolean>(true);
+
   const { addNotification } = useNotification();
 
-  // sign in user after sign up.
+  // sign in user after sign in.
   const { signIn } = useUser();
 
   const form = useForm<SchemaType>({
@@ -71,46 +65,51 @@ export const SignUp: FC = () => {
     resolver: zodResolver(schema),
   });
 
-  const { handleSubmit, setFocus, setValue, getValues } = form;
+  const { handleSubmit, setFocus, getValues, setValue } = form;
 
-  // handle sign up form submission.
-  const onSuccess = useCallback(async (data: SchemaType) => {
-    setLoading(true);
+  // handle sign in form submission.
+  const onSuccess = useCallback(
+    async (data: SchemaType) => {
+      setLoading(true);
 
-    try {
-      // firing sign up mutation.
-      const response = await client.user.signUp.mutate(data);
+      try {
+        // firing sign in mutation.
+        const response = await client.user.signIn.mutate(data);
 
-      // sign in user.
-      // by default remembering the user.
-      signIn(response, true);
+        // sign in user.
+        signIn(response, rememberMe);
 
-      addNotification({
-        severity: 'success',
-        message: formatMessage(
-          {
-            id: 'WELCOME-NAME',
-          },
-          { name: response.first },
-        ),
-      });
+        addNotification({
+          severity: 'success',
+          message: formatMessage(
+            {
+              id: 'WELCOME-NAME',
+            },
+            { name: response.first },
+          ),
+        });
 
-      navigate('/');
-    } catch (e: any) {
-      setLoading(false);
+        setLoading(false);
 
-      // wait to make sure the input disabled property is removed.
-      await wait(0);
+        navigate('/');
+      } catch (e: any) {
+        setLoading(false);
 
-      const id = e?.message;
-      if (id === 'MOBILE-ALREADY-REGISTERED') {
-        setFocus('mobile');
+        // wait to make sure the input disabled property is removed.
+        await wait(0);
+
+        const id = e?.message;
+        if (id === 'MOBILE-NOT-REGISTERED') {
+          setFocus('mobile');
+        } else if (id === 'PASSWORD-INCORRECT') {
+          setFocus('password');
+        }
       }
-    }
-    setLoading(false);
-  }, []);
+    },
+    [signIn, rememberMe, addNotification, formatMessage, navigate],
+  );
 
-  // handle sign up form submission error.
+  // handle sign in form submission error.
   const onError = useCallback((errors: FieldErrors<SchemaType>) => {
     addNotification({
       severity: 'warning',
@@ -118,26 +117,35 @@ export const SignUp: FC = () => {
     });
   }, []);
 
-  // redirecting user to sign in page.
-  const navigateToSignIn = useCallback(async () => {
-    navigate('/sign-in', {
+  // redirecting user to sign up page.
+  const navigateToSignUp = useCallback(async () => {
+    navigate('/sign-up', {
       state: {
         mobile: getValues('mobile'),
       },
     });
-  }, [navigate]);
+  }, [navigate, getValues]);
+
+  // handling remember me checkbox change event.
+  const onChangeRememberMe = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setRememberMe(event.target.checked);
+    },
+    [],
+  );
 
   // setting mobile when available in location state.
   useEffect(() => {
     if (mobile) {
       setValue('mobile', mobile);
+      setFocus('password');
     }
   }, [mobile]);
 
   return (
     <Grid item xl={6} md={6} sm={12}>
       <Typography variant="h3" align="center" sx={{ mb: 3 }}>
-        <FormattedMessage id="SIGN-UP" />
+        <FormattedMessage id="SIGN-IN" />
       </Typography>
       <Loading loading={loading}>
         <Paper
@@ -148,34 +156,6 @@ export const SignUp: FC = () => {
         >
           <form onSubmit={handleSubmit(onSuccess, onError)} noValidate>
             <Grid container>
-              <Grid item md={6} xs={12} pr={{ md: 1 }}>
-                <TextField
-                  form={form}
-                  registered="first"
-                  loading={loading}
-                  required
-                  sx={{
-                    mb: 2,
-                  }}
-                  label="FIRST-NAME"
-                  placeholder="FIRST-NAME"
-                  fullWidth
-                  autoFocus
-                />
-              </Grid>
-              <Grid item md={6} xs={12} pl={{ md: 1 }}>
-                <TextField
-                  form={form}
-                  registered="last"
-                  loading={loading}
-                  sx={{
-                    mb: 2,
-                  }}
-                  label="LAST-NAME"
-                  placeholder="LAST-NAME"
-                  fullWidth
-                />
-              </Grid>
               <Grid item xs={12}>
                 <TextField
                   form={form}
@@ -189,20 +169,7 @@ export const SignUp: FC = () => {
                   placeholder="MOBILE"
                   type="number"
                   fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  form={form}
-                  registered="email"
-                  loading={loading}
-                  sx={{
-                    mb: 2,
-                  }}
-                  label="EMAIL"
-                  placeholder="EMAIL"
-                  fullWidth
-                  type="email"
+                  autoFocus
                 />
               </Grid>
               <Grid item xs={12}>
@@ -222,6 +189,16 @@ export const SignUp: FC = () => {
                 />
               </Grid>
               <Grid item xs={12} textAlign="right">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={rememberMe}
+                      onChange={onChangeRememberMe}
+                      defaultChecked
+                    />
+                  }
+                  label={<FormattedMessage id="REMEMBER-ME" />}
+                />
                 <LoadingButton
                   type="submit"
                   variant="contained"
@@ -238,8 +215,8 @@ export const SignUp: FC = () => {
         </Paper>
       </Loading>
       <Grid container justifyContent="center">
-        <LoadingButton type="button" variant="text" onClick={navigateToSignIn}>
-          <FormattedMessage id="SIGN-IN" />
+        <LoadingButton type="button" variant="text" onClick={navigateToSignUp}>
+          <FormattedMessage id="SIGN-UP" />
         </LoadingButton>
       </Grid>
     </Grid>
