@@ -82,7 +82,8 @@ export const SignUp: FC = () => {
       const response = await client.user.signUp.mutate(data);
 
       // sign in user.
-      signIn(response);
+      // by default remembering the user.
+      signIn(response, true);
 
       addNotification({
         severity: 'success',
@@ -118,18 +119,13 @@ export const SignUp: FC = () => {
   }, []);
 
   // redirecting user to sign in page.
-  const navigateToSignIn = useCallback(
-    async (e: MouseEvent<HTMLElement>) => {
-      // blur validation was blocking the redirection.
-      e.currentTarget.click();
-      navigate('/sign-in', {
-        state: {
-          mobile: getValues('mobile'),
-        },
-      });
-    },
-    [navigate],
-  );
+  const navigateToSignIn = useCallback(async () => {
+    navigate('/sign-in', {
+      state: {
+        mobile: getValues('mobile'),
+      },
+    });
+  }, [navigate]);
 
   // setting mobile when available in location state.
   useEffect(() => {

@@ -1,8 +1,14 @@
-import { MouseEvent, FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState, ChangeEvent } from 'react';
 import { FieldErrors, useForm } from 'react-hook-form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Grid, Paper, Typography } from '@mui/material';
+import {
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  Paper,
+  Typography,
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -45,6 +51,9 @@ export const SignIn: FC = () => {
   // loading state for the component.
   const [loading, setLoading] = useState<boolean>(false);
 
+  // remember me checkbox state.
+  const [rememberMe, setRememberMe] = useState<boolean>(true);
+
   const { addNotification } = useNotification();
 
   // sign in user after sign in.
@@ -59,43 +68,46 @@ export const SignIn: FC = () => {
   const { handleSubmit, setFocus, getValues, setValue } = form;
 
   // handle sign in form submission.
-  const onSuccess = useCallback(async (data: SchemaType) => {
-    setLoading(true);
+  const onSuccess = useCallback(
+    async (data: SchemaType) => {
+      setLoading(true);
 
-    try {
-      // firing sign in mutation.
-      const response = await client.user.signIn.mutate(data);
+      try {
+        // firing sign in mutation.
+        const response = await client.user.signIn.mutate(data);
 
-      // sign in user.
-      signIn(response);
+        // sign in user.
+        signIn(response, rememberMe);
 
-      addNotification({
-        severity: 'success',
-        message: formatMessage(
-          {
-            id: 'WELCOME-NAME',
-          },
-          { name: response.first },
-        ),
-      });
+        addNotification({
+          severity: 'success',
+          message: formatMessage(
+            {
+              id: 'WELCOME-NAME',
+            },
+            { name: response.first },
+          ),
+        });
 
-      setLoading(false);
+        setLoading(false);
 
-      navigate('/');
-    } catch (e: any) {
-      setLoading(false);
+        navigate('/');
+      } catch (e: any) {
+        setLoading(false);
 
-      // wait to make sure the input disabled property is removed.
-      await wait(0);
+        // wait to make sure the input disabled property is removed.
+        await wait(0);
 
-      const id = e?.message;
-      if (id === 'MOBILE-NOT-REGISTERED') {
-        setFocus('mobile');
-      } else if (id === 'PASSWORD-INCORRECT') {
-        setFocus('password');
+        const id = e?.message;
+        if (id === 'MOBILE-NOT-REGISTERED') {
+          setFocus('mobile');
+        } else if (id === 'PASSWORD-INCORRECT') {
+          setFocus('password');
+        }
       }
-    }
-  }, []);
+    },
+    [signIn, rememberMe, addNotification, formatMessage, navigate],
+  );
 
   // handle sign in form submission error.
   const onError = useCallback((errors: FieldErrors<SchemaType>) => {
@@ -106,18 +118,20 @@ export const SignIn: FC = () => {
   }, []);
 
   // redirecting user to sign up page.
-  const navigateToSignUp = useCallback(
-    async (e: MouseEvent<HTMLElement>) => {
-      // blur validation was blocking the redirection.
-      e.currentTarget.click();
-      await wait(0);
-      navigate('/sign-up', {
-        state: {
-          mobile: getValues('mobile'),
-        },
-      });
+  const navigateToSignUp = useCallback(async () => {
+    navigate('/sign-up', {
+      state: {
+        mobile: getValues('mobile'),
+      },
+    });
+  }, [navigate, getValues]);
+
+  // handling remember me checkbox change event.
+  const onChangeRememberMe = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setRememberMe(event.target.checked);
     },
-    [navigate, getValues],
+    [],
   );
 
   // setting mobile when available in location state.
@@ -175,6 +189,16 @@ export const SignIn: FC = () => {
                 />
               </Grid>
               <Grid item xs={12} textAlign="right">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={rememberMe}
+                      onChange={onChangeRememberMe}
+                      defaultChecked
+                    />
+                  }
+                  label={<FormattedMessage id="REMEMBER-ME" />}
+                />
                 <LoadingButton
                   type="submit"
                   variant="contained"
