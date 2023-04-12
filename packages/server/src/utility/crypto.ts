@@ -22,3 +22,7 @@ export const decrypt = (encrypted: string): string => {
   const decipher = createDecipheriv(algorithm, KEY, iv);
   return decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
 };
+
+// decrypting base64 to string.
+export const base64ToString = (data: string) =>
+  Buffer.from(data, 'base64').toString();
