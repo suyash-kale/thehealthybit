@@ -79,7 +79,10 @@ export const SignUp: FC = () => {
 
     try {
       // firing sign up mutation.
-      const response = await client.user.signUp.mutate(data);
+      const response = await client.user.signUp.mutate({
+        ...data,
+        password: btoa(data.password),
+      });
 
       // sign in user.
       // by default remembering the user.

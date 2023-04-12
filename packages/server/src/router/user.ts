@@ -1,6 +1,7 @@
 import z from 'zod';
 
 import { router, procedurePubic, procedurePrivate } from '../utility/trpc';
+import { base64ToString } from '../utility/crypto';
 import { UserType, userService } from '../services/user';
 
 // user router.
@@ -36,7 +37,12 @@ export const userRouter = router({
           .max(20, { message: 'TOO-LONG' }),
       }),
     )
-    .mutation<UserType>(async ({ input }) => userService.signUp(input)),
+    .mutation<UserType>(async ({ input }) =>
+      userService.signUp({
+        ...input,
+        password: base64ToString(input.password),
+      }),
+    ),
 
   // signing in user.
   signIn: procedurePubic
@@ -54,7 +60,12 @@ export const userRouter = router({
           .max(20, { message: 'TOO-LONG' }),
       }),
     )
-    .mutation<UserType>(async ({ input }) => userService.signIn(input)),
+    .mutation<UserType>(async ({ input }) =>
+      userService.signIn({
+        ...input,
+        password: base64ToString(input.password),
+      }),
+    ),
 
   // getting user profile.
   me: procedurePrivate.query<UserType>(async ({ ctx: { user } }) =>
