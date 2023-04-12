@@ -21,5 +21,7 @@
   "WELCOME-NAME": "Welcome {name}!",
   "MOBILE-NOT-REGISTERED": "The mobile number is not registered.",
   "PASSWORD-INCORRECT": "The password is incorrect.",
-  "SUBMIT": "Submit"
+  "SUBMIT": "Submit",
+  "REMEMBER-ME": "Remember Me",
+  "SIGN-OUT": "Sign Out"
 }

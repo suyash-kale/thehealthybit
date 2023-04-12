@@ -1,11 +1,12 @@
 import { TRPCLink, createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import { observable } from '@trpc/server/observable';
-import { setRecoil } from 'recoil-nexus';
+import { setRecoil, getRecoil } from 'recoil-nexus';
 import type { AppRouter } from '../../../server/src/main';
 
 import { NotificationType } from '../types/notification';
 import generateRandomNumber from './generate-random-number';
 import { NotificationState } from '../state/notification';
+import { UserState } from '../state/user';
 import { intl } from './intl';
 
 export const handleErrors: TRPCLink<AppRouter> = () => {
@@ -44,7 +45,10 @@ export const client = createTRPCProxyClient<AppRouter>({
       url: `${import.meta.env.VITE_APP_SERVER_URL}trpc`,
       async headers() {
         return {
-          authorization: localStorage.getItem('authorization') || '',
+          authorization:
+            getRecoil(UserState)?.authorization ||
+            localStorage.getItem('authorization') ||
+            '',
         };
       },
     }),

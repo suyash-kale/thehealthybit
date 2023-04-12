@@ -18,8 +18,10 @@ export const useUser = () => {
 
   // handling user sign in.
   const signIn = useCallback(
-    (u: UserType) => {
-      localStorage.setItem('authorization', u.authorization);
+    (u: UserType, rememberMe: boolean = false) => {
+      if (rememberMe) {
+        localStorage.setItem('authorization', u.authorization);
+      }
       setUser(u);
     },
     [setUser],
