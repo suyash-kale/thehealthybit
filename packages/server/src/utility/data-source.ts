@@ -11,7 +11,7 @@ export const initialize = async () =>
     database: ENV.MYSQL_DATABASE,
     username: ENV.MYSQL_USER,
     password: ENV.MYSQL_PASSWORD,
-    logging: ENV.NODE_ENV !== 'production', // logging sql queries except in production.
+    logging: ENV.NODE_ENV === 'development', // logging sql queries except in production.
     synchronize: ENV.NODE_ENV === 'development', // synchronize entities except in development.
     entities: [path.join(__dirname, '../entities/mysql/*.*')],
   }).initialize();
