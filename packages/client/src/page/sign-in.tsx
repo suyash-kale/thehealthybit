@@ -74,7 +74,10 @@ export const SignIn: FC = () => {
 
       try {
         // firing sign in mutation.
-        const response = await client.user.signIn.mutate(data);
+        const response = await client.user.signIn.mutate({
+          ...data,
+          password: btoa(data.password),
+        });
 
         // sign in user.
         signIn(response, rememberMe);
@@ -194,7 +197,6 @@ export const SignIn: FC = () => {
                     <Checkbox
                       checked={rememberMe}
                       onChange={onChangeRememberMe}
-                      defaultChecked
                     />
                   }
                   label={<FormattedMessage id="REMEMBER-ME" />}
