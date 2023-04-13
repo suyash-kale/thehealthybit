@@ -141,10 +141,11 @@ export const MasterPage: FC<MasterPageType> = ({ children }) => {
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
-                onClick={onSignOut}
                 keepMounted
               >
-                <MenuItem>Sign out</MenuItem>
+                <MenuItem onClick={onSignOut}>
+                  <FormattedMessage id="SIGN-OUT" />
+                </MenuItem>
               </Menu>
             </>
           ) : (
