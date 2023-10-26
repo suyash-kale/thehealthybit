@@ -34,7 +34,8 @@ export const userRouter = router({
           .string()
           .min(1, { message: 'REQUIRED' })
           .min(6, { message: 'TOO-SHORT' })
-          .max(20, { message: 'TOO-LONG' }),
+          // the actual password length is 20, but we are using base64 encoding.
+          .max(28, { message: 'TOO-LONG' }),
       }),
     )
     .mutation<UserType>(async ({ input }) =>
@@ -57,7 +58,8 @@ export const userRouter = router({
           .string()
           .min(1, { message: 'REQUIRED' })
           .min(6, { message: 'TOO-SHORT' })
-          .max(20, { message: 'TOO-LONG' }),
+          // the actual password length is 20, but we are using base64 encoding.
+          .max(28, { message: 'TOO-LONG' }),
       }),
     )
     .mutation<UserType>(async ({ input }) =>
