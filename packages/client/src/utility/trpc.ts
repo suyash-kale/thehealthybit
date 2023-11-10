@@ -4,6 +4,7 @@ import { setRecoil, getRecoil } from 'recoil-nexus';
 import type { AppRouter } from '../../../server/src/main';
 
 import { NotificationType } from '../types/notification';
+import { ENV } from '../const/env'
 import generateRandomNumber from './generate-random-number';
 import { NotificationState } from '../state/notification';
 import { UserState } from '../state/user';
@@ -42,7 +43,7 @@ export const client = createTRPCProxyClient<AppRouter>({
   links: [
     handleErrors,
     httpBatchLink({
-      url: `${import.meta.env.VITE_APP_SERVER_URL}trpc`,
+      url: `${ENV.SERVER_URL}trpc`,
       async headers() {
         return {
           authorization:
