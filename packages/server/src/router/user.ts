@@ -9,40 +9,56 @@ export const userRouter = router({
   // signing up new user.
   signUp: procedurePubic
     .input(
+      // basic schema as the input is going to be encrypted.
       z.object({
-        first: z
-          .string()
-          .min(1, { message: 'REQUIRED' })
-          .min(2, { message: 'TOO-SHORT' })
-          .max(20, { message: 'TOO-LONG' }),
-        last: z
-          .string()
-          .min(2, { message: 'TOO-SHORT' })
-          .max(20, { message: 'TOO-LONG' })
-          .optional()
-          .or(z.literal('')),
-        mobile: z
-          .string()
-          .min(10, { message: 'INVALID-MOBILE' })
-          .max(10, { message: 'INVALID-MOBILE' }),
-        email: z
-          .string()
-          .email({ message: 'INVALID-EMAIL' })
-          .optional()
-          .or(z.literal('')),
-        password: z
-          .string()
-          .min(1, { message: 'REQUIRED' })
-          .min(6, { message: 'TOO-SHORT' })
-          // the actual password length is 20, but we are using base64 encoding.
-          .max(28, { message: 'TOO-LONG' }),
+        first: z.string().min(1, { message: 'REQUIRED' }),
+        last: z.string().optional().or(z.literal('')),
+        mobile: z.string().min(1, { message: 'REQUIRED' }),
+        email: z.string().optional().or(z.literal('')),
+        password: z.string().min(1, { message: 'REQUIRED' }),
       }),
     )
     .mutation<UserType>(async ({ input }) =>
-      userService.signUp({
-        ...input,
-        password: base64ToString(input.password),
-      }),
+      // will be signing up once the input is validated.
+      userService.signUp(
+        // actual validation schema.
+        // decrypting the input and validating it.
+        z
+          .object({
+            first: z
+              .string()
+              .min(1, { message: 'REQUIRED' })
+              .min(2, { message: 'TOO-SHORT' })
+              .max(20, { message: 'TOO-LONG' }),
+            last: z
+              .string()
+              .min(2, { message: 'TOO-SHORT' })
+              .max(20, { message: 'TOO-LONG' })
+              .optional()
+              .or(z.literal('')),
+            mobile: z
+              .string()
+              .min(10, { message: 'INVALID-MOBILE' })
+              .max(10, { message: 'INVALID-MOBILE' }),
+            email: z
+              .string()
+              .email({ message: 'INVALID-EMAIL' })
+              .optional()
+              .or(z.literal('')),
+            password: z
+              .string()
+              .min(1, { message: 'REQUIRED' })
+              .min(6, { message: 'TOO-SHORT' })
+              .max(20, { message: 'TOO-LONG' }),
+          })
+          .parse({
+            first: base64ToString(input.first),
+            last: base64ToString(input.last),
+            mobile: base64ToString(input.mobile),
+            email: base64ToString(input.email),
+            password: base64ToString(input.password),
+          }),
+      ),
     ),
 
   // signing in user.
