@@ -24,5 +24,5 @@ export const decrypt = (encrypted: string): string => {
 };
 
 // decrypting base64 to string.
-export const base64ToString = (data: string) =>
-  Buffer.from(data, 'base64').toString();
+export const base64ToString = (data?: string): string =>
+  data ? Buffer.from(data, 'base64').toString() : '';

@@ -12,6 +12,7 @@ import { TextField } from '../atom/text-field';
 import { Loading } from '../molecule/loading';
 import { Password } from '../molecule/password';
 import { useNotification } from '../hooks/use-notification';
+import { stringToBase64 } from '../utility/crypto';
 import { client } from '../utility/trpc';
 import { useUser } from '../hooks/use-user';
 import { wait } from '../utility/wait';
@@ -80,8 +81,12 @@ export const SignUp: FC = () => {
     try {
       // firing sign up mutation.
       const response = await client.user.signUp.mutate({
-        ...data,
-        password: btoa(data.password),
+        // encrypting data.
+        first: stringToBase64(data.first),
+        last: stringToBase64(data.last),
+        mobile: stringToBase64(data.mobile),
+        email: stringToBase64(data.email),
+        password: stringToBase64(data.password),
       });
 
       // sign in user.
