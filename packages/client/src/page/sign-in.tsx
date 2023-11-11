@@ -18,6 +18,7 @@ import { TextField } from '../atom/text-field';
 import { Loading } from '../molecule/loading';
 import { Password } from '../molecule/password';
 import { useNotification } from '../hooks/use-notification';
+import { stringToBase64 } from '../utility/crypto';
 import { client } from '../utility/trpc';
 import { useUser } from '../hooks/use-user';
 import { wait } from '../utility/wait';
@@ -75,8 +76,9 @@ export const SignIn: FC = () => {
       try {
         // firing sign in mutation.
         const response = await client.user.signIn.mutate({
-          ...data,
-          password: btoa(data.password),
+          // encrypting data.
+          mobile: stringToBase64(data.mobile),
+          password: stringToBase64(data.password),
         });
 
         // sign in user.
@@ -193,6 +195,7 @@ export const SignIn: FC = () => {
               </Grid>
               <Grid item xs={12} textAlign="right">
                 <FormControlLabel
+                  disabled={loading}
                   control={
                     <Checkbox
                       checked={rememberMe}
@@ -217,7 +220,12 @@ export const SignIn: FC = () => {
         </Paper>
       </Loading>
       <Grid container justifyContent="center">
-        <LoadingButton type="button" variant="text" onClick={navigateToSignUp}>
+        <LoadingButton
+          disabled={loading}
+          type="button"
+          variant="text"
+          onClick={navigateToSignUp}
+        >
           <FormattedMessage id="SIGN-UP" />
         </LoadingButton>
       </Grid>

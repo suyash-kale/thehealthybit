@@ -64,25 +64,35 @@ export const userRouter = router({
   // signing in user.
   signIn: procedurePubic
     .input(
+      // basic schema as the input is going to be encrypted.
       z.object({
-        mobile: z
-          .string()
-          .min(1, { message: 'REQUIRED' })
-          .min(10, { message: 'INVALID-MOBILE' })
-          .max(10, { message: 'INVALID-MOBILE' }),
-        password: z
-          .string()
-          .min(1, { message: 'REQUIRED' })
-          .min(6, { message: 'TOO-SHORT' })
-          // the actual password length is 20, but we are using base64 encoding.
-          .max(28, { message: 'TOO-LONG' }),
+        mobile: z.string().min(1, { message: 'REQUIRED' }),
+        password: z.string().min(1, { message: 'REQUIRED' }),
       }),
     )
     .mutation<UserType>(async ({ input }) =>
-      userService.signIn({
-        ...input,
-        password: base64ToString(input.password),
-      }),
+      // will be signing in once the input is validated.
+      userService.signIn(
+        // actual validation schema.
+        // decrypting the input and validating it.
+        z
+          .object({
+            mobile: z
+              .string()
+              .min(1, { message: 'REQUIRED' })
+              .min(10, { message: 'INVALID-MOBILE' })
+              .max(10, { message: 'INVALID-MOBILE' }),
+            password: z
+              .string()
+              .min(1, { message: 'REQUIRED' })
+              .min(6, { message: 'TOO-SHORT' })
+              .max(20, { message: 'TOO-LONG' }),
+          })
+          .parse({
+            mobile: base64ToString(input.mobile),
+            password: base64ToString(input.password),
+          }),
+      ),
     ),
 
   // getting user profile.

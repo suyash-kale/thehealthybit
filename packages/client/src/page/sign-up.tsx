@@ -246,7 +246,7 @@ export const SignUp: FC = () => {
         </Paper>
       </Loading>
       <Grid container justifyContent="center">
-        <LoadingButton type="button" variant="text" onClick={navigateToSignIn}>
+        <LoadingButton disabled={loading} type="button" variant="text" onClick={navigateToSignIn}>
           <FormattedMessage id="SIGN-IN" />
         </LoadingButton>
       </Grid>
