@@ -5,7 +5,6 @@
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "npm install --prefix ./packages/server && npm install --prefix ./packages/client",
     "prepare": "husky install",
     "start": "npm run start --prefix ./packages/server",
     "cz": "cz",
