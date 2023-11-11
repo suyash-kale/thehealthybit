@@ -1,1 +1,3 @@
-export { Locale } from '../../../server/src/types/intl';
+export enum Locale {
+    'English' = 'en',
+  }

@@ -20,7 +20,7 @@ export const App: FC = () => {
 
   useEffect(() => {
     const main = async () => {
-      const response = await fetch(`${ENV.SERVER_URL}locale/${locale}.json`);
+      const response = await fetch(`./locale/${locale}.json`);
       const data = await response.json();
       const intl = setIntl(locale, data);
       document.title = intl.formatMessage({ id: 'APP-NAME' });
