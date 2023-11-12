@@ -1,5 +1,11 @@
-import { FC, useCallback, useEffect, useState, ChangeEvent } from 'react';
-import { FieldErrors, useForm } from 'react-hook-form';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useState,
+  ChangeEvent,
+} from 'react';
+import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -97,13 +103,13 @@ export const SignIn: FC = () => {
         setLoading(false);
 
         navigate('/');
-      } catch (e: any) {
+      } catch (e: unknown) {
         setLoading(false);
 
         // wait to make sure the input disabled property is removed.
         await wait(0);
 
-        const id = e?.message;
+        const id = (e as { message?: string })?.message;
         if (id === 'MOBILE-NOT-REGISTERED') {
           setFocus('mobile');
         } else if (id === 'PASSWORD-INCORRECT') {
@@ -115,7 +121,7 @@ export const SignIn: FC = () => {
   );
 
   // handle sign in form submission error.
-  const onError = useCallback((errors: FieldErrors<SchemaType>) => {
+  const onError = useCallback(() => {
     addNotification({
       severity: 'warning',
       message: 'INVALID-FORM',
@@ -149,8 +155,8 @@ export const SignIn: FC = () => {
 
   return (
     <Grid item xl={6} md={6} sm={12}>
-      <Typography variant="h3" align="center" sx={{ mb: 3 }}>
-        <FormattedMessage id="SIGN-IN" />
+      <Typography variant='h3' align='center' sx={{ mb: 3 }}>
+        <FormattedMessage id='SIGN-IN' />
       </Typography>
       <Loading loading={loading}>
         <Paper
@@ -164,23 +170,23 @@ export const SignIn: FC = () => {
               <Grid item xs={12}>
                 <TextField
                   form={form}
-                  registered="mobile"
+                  registered='mobile'
                   loading={loading}
                   required
                   sx={{
                     mb: 2,
                   }}
-                  label="MOBILE"
-                  placeholder="MOBILE"
-                  type="number"
+                  label='MOBILE'
+                  placeholder='MOBILE'
+                  type='number'
                   fullWidth
-                  autoFocus
+                  focus
                 />
               </Grid>
               <Grid item xs={12}>
                 <Password
                   form={form}
-                  registered="password"
+                  registered='password'
                   loading={loading}
                   formControl={{
                     sx: {
@@ -188,12 +194,12 @@ export const SignIn: FC = () => {
                     },
                     required: true,
                   }}
-                  label="PASSWORD"
-                  placeholder="PASSWORD"
+                  label='PASSWORD'
+                  placeholder='PASSWORD'
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} textAlign="right">
+              <Grid item xs={12} textAlign='right'>
                 <FormControlLabel
                   disabled={loading}
                   control={
@@ -202,31 +208,31 @@ export const SignIn: FC = () => {
                       onChange={onChangeRememberMe}
                     />
                   }
-                  label={<FormattedMessage id="REMEMBER-ME" />}
+                  label={<FormattedMessage id='REMEMBER-ME' />}
                 />
                 <LoadingButton
-                  type="submit"
-                  variant="contained"
-                  size="large"
+                  type='submit'
+                  variant='contained'
+                  size='large'
                   endIcon={<ArrowForwardIcon />}
                   loading={loading}
-                  loadingPosition="end"
+                  loadingPosition='end'
                 >
-                  <FormattedMessage id="SUBMIT" />
+                  <FormattedMessage id='SUBMIT' />
                 </LoadingButton>
               </Grid>
             </Grid>
           </form>
         </Paper>
       </Loading>
-      <Grid container justifyContent="center">
+      <Grid container justifyContent='center'>
         <LoadingButton
           disabled={loading}
-          type="button"
-          variant="text"
+          type='button'
+          variant='text'
           onClick={navigateToSignUp}
         >
-          <FormattedMessage id="SIGN-UP" />
+          <FormattedMessage id='SIGN-UP' />
         </LoadingButton>
       </Grid>
     </Grid>

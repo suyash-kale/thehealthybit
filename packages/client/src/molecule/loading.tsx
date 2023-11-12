@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import Box, { BoxProps } from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import LinearProgress from '@mui/material/LinearProgress';
