@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { FieldValues, PathValue, UseFormReturn } from 'react-hook-form';
 import {
   FormControl,
@@ -18,10 +18,10 @@ import {
 } from '@mui/icons-material';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import generateRandomNumber from '../utility/generate-random-number';
+import { generateRandomNumber } from '../utility/generate-random-number';
 
 export type PasswordProps<T extends FieldValues, P extends keyof T> = {
-  form: UseFormReturn<T, any>;
+  form: UseFormReturn<T, Record<string, unknown>>;
   registered: T[P];
   loading?: boolean;
   formControl?: FormControlProps;
@@ -74,7 +74,7 @@ export const Password = <T extends FieldValues, P extends keyof T>({
         id={Id}
         type={show ? 'text' : 'password'}
         endAdornment={
-          <InputAdornment position="end">
+          <InputAdornment position='end'>
             <IconButton disabled={loading} onClick={() => setShow((b) => !b)}>
               {show ? <VisibilityIcon /> : <VisibilityOffIcon />}
             </IconButton>

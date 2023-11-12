@@ -4,8 +4,8 @@ import { setRecoil, getRecoil } from 'recoil-nexus';
 import type { AppRouter } from '../../../server/src/main';
 
 import { NotificationType } from '../types/notification';
-import { ENV } from '../const/env'
-import generateRandomNumber from './generate-random-number';
+import { ENV } from '../const/env';
+import { generateRandomNumber } from './generate-random-number';
 import { NotificationState } from '../state/notification';
 import { UserState } from '../state/user';
 import { intl } from './intl';
