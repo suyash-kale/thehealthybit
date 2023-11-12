@@ -1,5 +1,5 @@
-import { FC, MouseEvent, useCallback, useEffect, useState } from 'react';
-import { FieldErrors, useForm } from 'react-hook-form';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Grid, Paper, Typography } from '@mui/material';
@@ -104,13 +104,13 @@ export const SignUp: FC = () => {
       });
 
       navigate('/');
-    } catch (e: any) {
+    } catch (e: unknown) {
       setLoading(false);
 
       // wait to make sure the input disabled property is removed.
       await wait(0);
 
-      const id = e?.message;
+      const id = (e as { message?: string })?.message;
       if (id === 'MOBILE-ALREADY-REGISTERED') {
         setFocus('mobile');
       }
@@ -119,7 +119,7 @@ export const SignUp: FC = () => {
   }, []);
 
   // handle sign up form submission error.
-  const onError = useCallback((errors: FieldErrors<SchemaType>) => {
+  const onError = useCallback(() => {
     addNotification({
       severity: 'warning',
       message: 'INVALID-FORM',
@@ -144,8 +144,8 @@ export const SignUp: FC = () => {
 
   return (
     <Grid item xl={6} md={6} sm={12}>
-      <Typography variant="h3" align="center" sx={{ mb: 3 }}>
-        <FormattedMessage id="SIGN-UP" />
+      <Typography variant='h3' align='center' sx={{ mb: 3 }}>
+        <FormattedMessage id='SIGN-UP' />
       </Typography>
       <Loading loading={loading}>
         <Paper
@@ -159,64 +159,64 @@ export const SignUp: FC = () => {
               <Grid item md={6} xs={12} pr={{ md: 1 }}>
                 <TextField
                   form={form}
-                  registered="first"
+                  registered='first'
                   loading={loading}
                   required
                   sx={{
                     mb: 2,
                   }}
-                  label="FIRST-NAME"
-                  placeholder="FIRST-NAME"
+                  label='FIRST-NAME'
+                  placeholder='FIRST-NAME'
                   fullWidth
-                  autoFocus
+                  focus
                 />
               </Grid>
               <Grid item md={6} xs={12} pl={{ md: 1 }}>
                 <TextField
                   form={form}
-                  registered="last"
+                  registered='last'
                   loading={loading}
                   sx={{
                     mb: 2,
                   }}
-                  label="LAST-NAME"
-                  placeholder="LAST-NAME"
+                  label='LAST-NAME'
+                  placeholder='LAST-NAME'
                   fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   form={form}
-                  registered="mobile"
+                  registered='mobile'
                   loading={loading}
                   required
                   sx={{
                     mb: 2,
                   }}
-                  label="MOBILE"
-                  placeholder="MOBILE"
-                  type="number"
+                  label='MOBILE'
+                  placeholder='MOBILE'
+                  type='number'
                   fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   form={form}
-                  registered="email"
+                  registered='email'
                   loading={loading}
                   sx={{
                     mb: 2,
                   }}
-                  label="EMAIL"
-                  placeholder="EMAIL"
+                  label='EMAIL'
+                  placeholder='EMAIL'
                   fullWidth
-                  type="email"
+                  type='email'
                 />
               </Grid>
               <Grid item xs={12}>
                 <Password
                   form={form}
-                  registered="password"
+                  registered='password'
                   loading={loading}
                   formControl={{
                     sx: {
@@ -224,30 +224,35 @@ export const SignUp: FC = () => {
                     },
                     required: true,
                   }}
-                  label="PASSWORD"
-                  placeholder="PASSWORD"
+                  label='PASSWORD'
+                  placeholder='PASSWORD'
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12} textAlign="right">
+              <Grid item xs={12} textAlign='right'>
                 <LoadingButton
-                  type="submit"
-                  variant="contained"
-                  size="large"
+                  type='submit'
+                  variant='contained'
+                  size='large'
                   endIcon={<ArrowForwardIcon />}
                   loading={loading}
-                  loadingPosition="end"
+                  loadingPosition='end'
                 >
-                  <FormattedMessage id="SUBMIT" />
+                  <FormattedMessage id='SUBMIT' />
                 </LoadingButton>
               </Grid>
             </Grid>
           </form>
         </Paper>
       </Loading>
-      <Grid container justifyContent="center">
-        <LoadingButton disabled={loading} type="button" variant="text" onClick={navigateToSignIn}>
-          <FormattedMessage id="SIGN-IN" />
+      <Grid container justifyContent='center'>
+        <LoadingButton
+          disabled={loading}
+          type='button'
+          variant='text'
+          onClick={navigateToSignIn}
+        >
+          <FormattedMessage id='SIGN-IN' />
         </LoadingButton>
       </Grid>
     </Grid>

@@ -31,16 +31,16 @@ export const PageAuth: FC<PageAuthType> = ({ children, redirectIfNotAuth }) => {
   if (!isAuth()) {
     return (
       <PageMessage
-        title={<FormattedMessage id="NOT-AUTHORIZED" />}
+        title={<FormattedMessage id='NOT-AUTHORIZED' />}
         end={
-          <Grid container justifyContent="center">
-            <LoadingButton variant="text" onClick={onSignIn}>
+          <Grid container justifyContent='center'>
+            <LoadingButton variant='text' onClick={onSignIn}>
               Sign in
             </LoadingButton>
           </Grid>
         }
       >
-        <FormattedMessage id="NOT-AUTHORIZED-MESSAGE" />
+        <FormattedMessage id='NOT-AUTHORIZED-MESSAGE' />
       </PageMessage>
     );
   }

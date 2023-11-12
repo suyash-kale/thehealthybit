@@ -1,3 +1,4 @@
+import React, { useEffect, useRef } from 'react';
 import { FieldValues, UseFormReturn, PathValue, Path } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import MaterialTextField, { TextFieldProps } from '@mui/material/TextField';
@@ -6,6 +7,7 @@ type TextFieldType<T extends FieldValues, P extends Path<T>> = {
   form: UseFormReturn<T, unknown>;
   registered: P;
   loading?: boolean;
+  focus?: boolean;
 } & TextFieldProps;
 
 // higher order component for material text field.
@@ -15,9 +17,12 @@ export const TextField = <T extends FieldValues, P extends Path<T>>({
   loading,
   label,
   placeholder,
+  focus,
   ...props
 }: TextFieldType<T, P>) => {
   const { formatMessage } = useIntl();
+
+  const inputRef = useRef<HTMLDivElement>(null);
 
   const { formState, register, setValue } = form;
 
@@ -26,6 +31,12 @@ export const TextField = <T extends FieldValues, P extends Path<T>>({
   const isFormDirty = formState.submitCount > 0;
 
   const helperText = errors[registered]?.message?.toString();
+
+  useEffect(() => {
+    if (focus) {
+      inputRef.current?.querySelector('input')?.focus();
+    }
+  }, [focus]);
 
   return (
     <MaterialTextField
@@ -49,6 +60,7 @@ export const TextField = <T extends FieldValues, P extends Path<T>>({
           ? formatMessage({ id: placeholder })
           : placeholder
       }
+      ref={inputRef}
       {...props}
     />
   );

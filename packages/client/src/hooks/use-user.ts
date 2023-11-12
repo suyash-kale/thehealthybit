@@ -18,7 +18,7 @@ export const useUser = () => {
 
   // handling user sign in.
   const signIn = useCallback(
-    (u: UserType, rememberMe: boolean = false) => {
+    (u: UserType, rememberMe = false) => {
       if (rememberMe) {
         localStorage.setItem('authorization', u.authorization);
       }
