@@ -4,7 +4,7 @@ import { useSetRecoilState } from 'recoil';
 
 import { NotificationType } from '../types/notification';
 import { NotificationState } from '../state/notification';
-import generateRandomNumber from '../utility/generate-random-number';
+import { generateRandomNumber } from '../utility/generate-random-number';
 
 interface UseNotificationReturn {
   addNotification: (

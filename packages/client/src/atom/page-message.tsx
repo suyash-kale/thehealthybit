@@ -11,9 +11,9 @@ interface PageMessageType {
 export const PageMessage: FC<PageMessageType> = ({ title, children, end }) => {
   return (
     <Container>
-      <Grid container spacing={2} justifyContent="center" marginTop={2}>
+      <Grid container spacing={2} justifyContent='center' marginTop={2}>
         <Grid item xl={6} md={6} sm={12}>
-          <Typography variant="h3" align="center" sx={{ mb: 3 }}>
+          <Typography variant='h3' align='center' sx={{ mb: 3 }}>
             {title}
           </Typography>
           <Paper
