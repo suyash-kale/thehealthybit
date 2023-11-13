@@ -4,4 +4,5 @@ export interface NotificationType {
   Id: number;
   severity: AlertColor;
   message: string;
+  variables?: Record<string, string | number>;
 }

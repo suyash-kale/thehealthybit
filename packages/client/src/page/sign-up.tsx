@@ -16,6 +16,7 @@ import { stringToBase64 } from '../utility/crypto';
 import { client } from '../utility/trpc';
 import { useUser } from '../hooks/use-user';
 import { wait } from '../utility/wait';
+import { ButtonAnimation } from '../atom/animation/button';
 
 // schema for sign up form data.
 const schema = z.object({
@@ -187,6 +188,7 @@ export const SignUp: FC = () => {
               <Grid item xs={12}>
                 <TextField
                   form={form}
+                  defaultValue={mobile}
                   registered='mobile'
                   loading={loading}
                   required
@@ -230,16 +232,18 @@ export const SignUp: FC = () => {
                 />
               </Grid>
               <Grid item xs={12} textAlign='right'>
-                <LoadingButton
-                  type='submit'
-                  variant='contained'
-                  size='large'
-                  endIcon={<ArrowForwardIcon />}
-                  loading={loading}
-                  loadingPosition='end'
-                >
-                  <FormattedMessage id='SUBMIT' />
-                </LoadingButton>
+                <ButtonAnimation>
+                  <LoadingButton
+                    type='submit'
+                    variant='contained'
+                    size='large'
+                    endIcon={<ArrowForwardIcon />}
+                    loading={loading}
+                    loadingPosition='end'
+                  >
+                    <FormattedMessage id='SUBMIT' />
+                  </LoadingButton>
+                </ButtonAnimation>
               </Grid>
             </Grid>
           </form>
