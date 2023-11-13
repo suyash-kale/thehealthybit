@@ -1,13 +1,12 @@
 import React, { FC, useEffect, useState } from 'react';
-import { RouterProvider } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { Locale } from './types/locale';
-import { ENV } from './const/env';
 import { THEME } from './const/theme';
-import { router } from './router';
+import { Router } from './router';
 import { LocaleState } from './state/locale';
 import { setIntl } from './utility/intl';
 import { Notification } from './molecule/notification';
@@ -41,7 +40,9 @@ export const App: FC = () => {
             locale={locale}
             messages={messages}
           >
-            <RouterProvider router={router} />
+            <BrowserRouter>
+              <Router />
+            </BrowserRouter>
             <Notification />
           </IntlProvider>
         ) : (
