@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { TextField } from '../atom/text-field';
@@ -28,6 +28,7 @@ import { stringToBase64 } from '../utility/crypto';
 import { client } from '../utility/trpc';
 import { useUser } from '../hooks/use-user';
 import { wait } from '../utility/wait';
+import { ButtonAnimation } from '../atom/animation/button';
 
 // schema for sign in form data.
 const schema = z.object({
@@ -47,8 +48,6 @@ type SchemaType = z.infer<typeof schema>;
 
 // sign in page component.
 export const SignIn: FC = () => {
-  const { formatMessage } = useIntl();
-
   const navigate = useNavigate();
 
   // get mobile from router state.
@@ -92,12 +91,8 @@ export const SignIn: FC = () => {
 
         addNotification({
           severity: 'success',
-          message: formatMessage(
-            {
-              id: 'WELCOME-NAME',
-            },
-            { name: response.first },
-          ),
+          message: 'WELCOME-NAME',
+          variables: { name: response.first },
         });
 
         setLoading(false);
@@ -117,7 +112,7 @@ export const SignIn: FC = () => {
         }
       }
     },
-    [signIn, rememberMe, addNotification, formatMessage, navigate],
+    [signIn, rememberMe, addNotification, navigate],
   );
 
   // handle sign in form submission error.
@@ -210,16 +205,18 @@ export const SignIn: FC = () => {
                   }
                   label={<FormattedMessage id='REMEMBER-ME' />}
                 />
-                <LoadingButton
-                  type='submit'
-                  variant='contained'
-                  size='large'
-                  endIcon={<ArrowForwardIcon />}
-                  loading={loading}
-                  loadingPosition='end'
-                >
-                  <FormattedMessage id='SUBMIT' />
-                </LoadingButton>
+                <ButtonAnimation>
+                  <LoadingButton
+                    type='submit'
+                    variant='contained'
+                    size='large'
+                    endIcon={<ArrowForwardIcon />}
+                    loading={loading}
+                    loadingPosition='end'
+                  >
+                    <FormattedMessage id='SUBMIT' />
+                  </LoadingButton>
+                </ButtonAnimation>
               </Grid>
             </Grid>
           </form>
