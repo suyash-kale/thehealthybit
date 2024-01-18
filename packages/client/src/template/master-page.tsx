@@ -193,7 +193,7 @@ export const MasterPage: FC<MasterPageType> = () => {
           </List>
         </DrawerStyled>
       )}
-      <Box component='main' sx={{ flexGrow: 1, p: 3 }}>
+      <Box component='main' sx={{ flexGrow: 1, mt: 2, p: 3 }}>
         <DrawerHeader />
         <Container>
           <Grid container spacing={2} justifyContent='center'>

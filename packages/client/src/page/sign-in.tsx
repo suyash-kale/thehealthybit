@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { TextField } from '../atom/text-field';
@@ -28,9 +28,16 @@ import { stringToBase64 } from '../utility/crypto';
 import { client } from '../utility/trpc';
 import { useUser } from '../hooks/use-user';
 import { wait } from '../utility/wait';
+import { ButtonAnimation } from '../atom/animation/button';
+import { CountryCode, CountryType } from '../molecule/country-code';
 
 // schema for sign in form data.
 const schema = z.object({
+  countryCode: z
+    .string()
+    .min(1, { message: 'REQUIRED' })
+    .min(2, { message: 'INVALID-COUNTRY' })
+    .max(2, { message: 'INVALID-COUNTRY' }),
   mobile: z
     .string()
     .min(1, { message: 'REQUIRED' })
@@ -47,8 +54,6 @@ type SchemaType = z.infer<typeof schema>;
 
 // sign in page component.
 export const SignIn: FC = () => {
-  const { formatMessage } = useIntl();
-
   const navigate = useNavigate();
 
   // get mobile from router state.
@@ -83,6 +88,7 @@ export const SignIn: FC = () => {
         // firing sign in mutation.
         const response = await client.user.signIn.mutate({
           // encrypting data.
+          countryCode: stringToBase64(data.countryCode),
           mobile: stringToBase64(data.mobile),
           password: stringToBase64(data.password),
         });
@@ -92,12 +98,8 @@ export const SignIn: FC = () => {
 
         addNotification({
           severity: 'success',
-          message: formatMessage(
-            {
-              id: 'WELCOME-NAME',
-            },
-            { name: response.first },
-          ),
+          message: 'WELCOME-NAME',
+          variables: { name: response.first },
         });
 
         setLoading(false);
@@ -117,7 +119,7 @@ export const SignIn: FC = () => {
         }
       }
     },
-    [signIn, rememberMe, addNotification, formatMessage, navigate],
+    [signIn, rememberMe, addNotification, navigate, setFocus],
   );
 
   // handle sign in form submission error.
@@ -145,6 +147,12 @@ export const SignIn: FC = () => {
     [],
   );
 
+  // handling country code change event.
+  const onChangeCountry = useCallback(
+    ({ code }: CountryType) => setValue('countryCode', code),
+    [setValue],
+  );
+
   // setting mobile when available in location state.
   useEffect(() => {
     if (mobile) {
@@ -167,9 +175,13 @@ export const SignIn: FC = () => {
         >
           <form onSubmit={handleSubmit(onSuccess, onError)} noValidate>
             <Grid container>
-              <Grid item xs={12}>
+              <Grid item md={3} xs={12} pr={{ md: 1 }}>
+                <CountryCode onChange={onChangeCountry} />
+              </Grid>
+              <Grid item md={9} xs={12} pl={{ md: 1 }}>
                 <TextField
                   form={form}
+                  defaultValue={mobile}
                   registered='mobile'
                   loading={loading}
                   required
@@ -210,16 +222,18 @@ export const SignIn: FC = () => {
                   }
                   label={<FormattedMessage id='REMEMBER-ME' />}
                 />
-                <LoadingButton
-                  type='submit'
-                  variant='contained'
-                  size='large'
-                  endIcon={<ArrowForwardIcon />}
-                  loading={loading}
-                  loadingPosition='end'
-                >
-                  <FormattedMessage id='SUBMIT' />
-                </LoadingButton>
+                <ButtonAnimation>
+                  <LoadingButton
+                    type='submit'
+                    variant='contained'
+                    size='large'
+                    endIcon={<ArrowForwardIcon />}
+                    loading={loading}
+                    loadingPosition='end'
+                  >
+                    <FormattedMessage id='SUBMIT' />
+                  </LoadingButton>
+                </ButtonAnimation>
               </Grid>
             </Grid>
           </form>

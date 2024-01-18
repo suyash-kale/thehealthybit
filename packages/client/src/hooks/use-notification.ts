@@ -26,7 +26,11 @@ export const useNotification = (): UseNotificationReturn => {
       setNotification((prev) => {
         return [
           ...prev,
-          { ...data, Id, message: formatMessage({ id: data.message }) },
+          {
+            ...data,
+            Id,
+            message: formatMessage({ id: data.message }, data.variables),
+          },
         ];
       });
       return Id;

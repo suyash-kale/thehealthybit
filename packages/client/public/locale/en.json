@@ -23,5 +23,11 @@
   "PASSWORD-INCORRECT": "The password is incorrect.",
   "SUBMIT": "Submit",
   "REMEMBER-ME": "Remember Me",
-  "SIGN-OUT": "Sign Out"
+  "SIGN-OUT": "Sign Out",
+  "MOBILE-VERIFICATION": "Mobile verification",
+  "EMAIL-ALREADY-REGISTERED": "The email address is already registered.",
+  "CODE": "Code",
+  "INVALID-OTP": "The OTP is invalid.",
+  "INVALID-COUNTRY": "The country is invalid.",
+  "INDIA": "India"
 }

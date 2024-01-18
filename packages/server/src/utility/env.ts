@@ -8,4 +8,6 @@ export const ENV = {
   NODE_ENV: process.env.NODE_ENV as 'development' | 'beta' | 'production',
   SALT_LENGTH: parseInt(process.env.SALT_LENGTH as string),
   SECRET: process.env.SECRET as string,
+  MONGODB_URL: process.env.MONGODB_URL as string,
+  SMS_AUTH_KEY: process.env.SMS_AUTH_KEY as string,
 };

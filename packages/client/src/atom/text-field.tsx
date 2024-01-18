@@ -22,7 +22,7 @@ export const TextField = <T extends FieldValues, P extends Path<T>>({
 }: TextFieldType<T, P>) => {
   const { formatMessage } = useIntl();
 
-  const inputRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<null | HTMLDivElement>(null);
 
   const { formState, register, setValue } = form;
 
@@ -32,15 +32,24 @@ export const TextField = <T extends FieldValues, P extends Path<T>>({
 
   const helperText = errors[registered]?.message?.toString();
 
+  const { ref, ...reg } = register(registered);
+
   useEffect(() => {
     if (focus) {
-      inputRef.current?.querySelector('input')?.focus();
+      // waiting for route animation to finish.
+      setTimeout(() => {
+        inputRef.current?.querySelector('input')?.focus();
+      }, 550);
     }
   }, [focus]);
 
   return (
     <MaterialTextField
-      {...register(registered)}
+      {...reg}
+      ref={(e) => {
+        ref(e);
+        inputRef.current = e;
+      }}
       disabled={loading}
       onChange={(ev) => {
         setValue(registered, ev.target.value as PathValue<T, P>, {
@@ -60,7 +69,6 @@ export const TextField = <T extends FieldValues, P extends Path<T>>({
           ? formatMessage({ id: placeholder })
           : placeholder
       }
-      ref={inputRef}
       {...props}
     />
   );
