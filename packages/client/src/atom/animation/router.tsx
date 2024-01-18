@@ -10,6 +10,7 @@ export const RouterAnimation: FC<RouterAnimationProps> = ({ children }) => (
     style={{
       display: 'flex',
       justifyContent: 'center',
+      width: '100%',
     }}
     variants={{
       hidden: {

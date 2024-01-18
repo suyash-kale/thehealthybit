@@ -2,6 +2,7 @@ import {
   AfterLoad,
   BaseEntity,
   BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   OneToOne,
@@ -19,6 +20,9 @@ export class User extends BaseEntity {
   id: string;
 
   @Column('text')
+  countryCode: string;
+
+  @Column('text')
   mobile: string;
 
   @Column('text')
@@ -33,15 +37,18 @@ export class User extends BaseEntity {
   @Column('boolean')
   active = true;
 
-  // encrypting mobile number before saving it in database.
+  // encrypting values before saving it in database.
   @BeforeInsert()
+  @BeforeUpdate()
   beforeInsert() {
+    this.countryCode = encrypt(this.countryCode);
     this.mobile = encrypt(this.mobile);
   }
 
-  // decrypting mobile number after fetching it from database.
+  // decrypting values after fetching it from database.
   @AfterLoad()
   afterLoad() {
+    this.countryCode = decrypt(this.countryCode);
     this.mobile = decrypt(this.mobile);
   }
 
