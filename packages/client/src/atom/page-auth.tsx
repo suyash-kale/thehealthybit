@@ -19,7 +19,7 @@ export const PageAuth: FC<PageAuthType> = ({ children, redirectIfNotAuth }) => {
   const { isAuth } = useUser();
 
   // handling click event for sign in button.
-  const onSignIn = useCallback(() => navigate('/sign-in'), [navigate]);
+  const onSignIn = useCallback(() => navigate('/check-in'), [navigate]);
 
   // redirect to the specified page if not authenticated.
   useEffect(() => {

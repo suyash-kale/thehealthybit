@@ -4,9 +4,8 @@ import { AnimatePresence } from 'framer-motion';
 
 import { MasterPage } from './template/master-page';
 import { RouterAnimation } from './atom/animation/router';
-import { Verify } from './page/verify';
-import { SignUp } from './page/sign-up';
-import { SignIn } from './page/sign-in';
+import { CheckIn } from './page/check-in/check-in';
+import { CheckInOtp } from './page/check-in/otp';
 import { PageAuth } from './atom/page-auth';
 import { Dashboard } from './page/dashboard';
 
@@ -19,7 +18,7 @@ export const Router = () => {
       element: <MasterPage />,
       children: [
         {
-          path: 'sign-up',
+          path: 'check-in',
           element: (
             <RouterAnimation>
               <Empty />
@@ -28,26 +27,18 @@ export const Router = () => {
           children: [
             {
               path: '',
-              element: <SignUp />,
+              element: <CheckIn />,
             },
             {
-              path: 'verify',
-              element: <Verify />,
+              path: 'otp',
+              element: <CheckInOtp />,
             },
           ],
         },
         {
-          path: 'sign-in',
-          element: (
-            <RouterAnimation>
-              <SignIn />
-            </RouterAnimation>
-          ),
-        },
-        {
           path: '/',
           element: (
-            <PageAuth redirectIfNotAuth='/sign-in'>
+            <PageAuth redirectIfNotAuth='/check-in'>
               <RouterAnimation>
                 <Dashboard />
               </RouterAnimation>

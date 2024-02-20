@@ -12,7 +12,6 @@ import {
   Box,
   Container,
   Grid,
-  Button,
   Menu,
   MenuItem,
   AppBar,
@@ -137,7 +136,7 @@ export const MasterPage: FC<MasterPageType> = () => {
           <Typography variant='h6' noWrap component='div' sx={{ flexGrow: 1 }}>
             <FormattedMessage id='APP-NAME' />
           </Typography>
-          {isSignIn ? (
+          {isSignIn && (
             <>
               <IconButton
                 color='inherit'
@@ -164,15 +163,6 @@ export const MasterPage: FC<MasterPageType> = () => {
                   <FormattedMessage id='SIGN-OUT' />
                 </MenuItem>
               </Menu>
-            </>
-          ) : (
-            <>
-              <Button color='inherit' onClick={() => navigate('/sign-in')}>
-                <FormattedMessage id='SIGN-IN' />
-              </Button>
-              <Button color='inherit' onClick={() => navigate('/sign-up')}>
-                <FormattedMessage id='SIGN-UP' />
-              </Button>
             </>
           )}
         </Toolbar>

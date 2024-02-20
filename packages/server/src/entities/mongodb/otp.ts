@@ -12,7 +12,6 @@ import { encrypt, decrypt } from '../../utility/crypto';
 
 export enum eOtpType {
   mobile = 'mobile',
-  email = 'email',
 }
 
 @Entity()
@@ -31,12 +30,6 @@ export class Otp extends BaseEntity {
 
   @Column('datetime')
   createdAt: Date = new Date();
-
-  @Column('datetime')
-  updatedAt: Date = new Date();
-
-  @Column('boolean')
-  used = false;
 
   // encrypting values before saving it in database.
   @BeforeInsert()
