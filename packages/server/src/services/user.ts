@@ -9,18 +9,24 @@ import { userDetailService } from './user-detail';
 import { Otp, eOtpType } from '../entities/mongodb/otp';
 import { encrypt } from '../utility/crypto';
 
-// parameters for signing up new user.
+interface CheckInParams {
+  countryCode: string;
+  mobile: string;
+}
+
+interface VerifyParams {
+  countryCode: string;
+  mobile: string;
+  password: string;
+}
+
 interface SignUpParams {
   countryCode: string;
   mobile: string;
   password: string;
-  first: string;
-  last?: string;
-  email?: string;
-  code?: string;
+  code: string;
 }
 
-// parameters for signing in user.
 interface SignInParams {
   countryCode: string;
   mobile: string;
@@ -29,10 +35,7 @@ interface SignInParams {
 
 // client session type for user.
 export interface UserType {
-  first: UserDetail['first'];
-  last?: UserDetail['last'];
   mobile: User['mobile'];
-  email?: UserDetail['email'];
   authorization: string;
 }
 
@@ -40,23 +43,31 @@ interface SessionUserType extends Record<string, unknown> {
   id: User['id'];
 }
 
-// manipulating user.
 class UserService {
+  // checking if user exist.
+  public async exist(data: CheckInParams): Promise<boolean> {
+    const { countryCode, mobile } = data;
+    // checking mobile is registered.
+    return !!(await User.count({
+      where: { countryCode: encrypt(countryCode), mobile: encrypt(mobile) },
+    }));
+  }
+
   // verifying signing up requests.
-  public async verify(data: SignUpParams): Promise<void> {
-    const { countryCode, mobile, first } = data;
+  public async verify(data: VerifyParams): Promise<void> {
+    const { countryCode, mobile } = data;
     // validating user input data.
     await this.validate(data);
     // sending mobile OTP for verification.
-    await this.sendOtp(countryCode + mobile, eOtpType.mobile, first);
+    await this.sendOtp(countryCode + mobile, eOtpType.mobile, 'user');
   }
 
   // signing up new user once verified.
   public async signUp(data: SignUpParams): Promise<UserType> {
-    const { countryCode, mobile, first, last, email, code } = data;
+    const { countryCode, mobile, code } = data;
 
     // validating user input data.
-    this.validate(data);
+    await this.validate(data);
 
     // fetching OTP for the identity, type and code.
     const otp = code
@@ -69,7 +80,7 @@ class UserService {
         })
       : null;
 
-    // making sure the OTP exist.
+    // making sure the OTP is valid.
     if (!otp) {
       throw new TRPCError({
         code: 'PRECONDITION_FAILED',
@@ -77,10 +88,8 @@ class UserService {
       });
     }
 
-    // updating OTP status.
-    otp.used = true;
-    otp.updatedAt = new Date();
-    otp.save();
+    // removing OTP after use.
+    otp.remove();
 
     // hashing password.
     const password = await bcryptjs.hash(data.password, ENV.SALT_LENGTH);
@@ -94,9 +103,6 @@ class UserService {
 
     // saving user details.
     const userDetail = new UserDetail();
-    userDetail.first = first;
-    userDetail.last = last;
-    userDetail.email = email;
     userDetail.user = user;
     await userDetailService.create(userDetail);
 
@@ -151,10 +157,7 @@ class UserService {
     const authorization = this.getAuthorization(data);
 
     return {
-      first: user.detail.first,
-      last: user.detail.last,
       mobile: user.mobile,
-      email: user.detail.email,
       authorization,
     };
   }
@@ -194,9 +197,8 @@ class UserService {
   }
 
   // validating user input data.
-  private async validate(data: SignUpParams): Promise<void> {
-    const { countryCode, mobile, email } = data;
-
+  private async validate(data: VerifyParams): Promise<void> {
+    const { countryCode, mobile } = data;
     // checking mobile is already registered.
     if (
       await User.findOne({
@@ -206,19 +208,6 @@ class UserService {
       throw new TRPCError({
         code: 'PRECONDITION_FAILED',
         message: 'MOBILE-ALREADY-REGISTERED',
-      });
-    }
-
-    // checking email is already registered.
-    if (
-      email &&
-      (await UserDetail.findOne({
-        where: { email: encrypt(email) },
-      }))
-    ) {
-      throw new TRPCError({
-        code: 'PRECONDITION_FAILED',
-        message: 'EMAIL-ALREADY-REGISTERED',
       });
     }
   }

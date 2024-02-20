@@ -53,7 +53,6 @@ export class User extends BaseEntity {
   }
 
   // relationships.
-
   @OneToOne(() => UserDetail, (userDetail) => userDetail.user)
   detail: Relation<UserDetail>;
 }

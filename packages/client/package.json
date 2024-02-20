@@ -10,7 +10,8 @@
     "lint-fix": "npm run lint --fix",
     "prettier": "prettier ./ --check",
     "prettier-write": "prettier ./ --write",
-    "cz": "npm run cz --prefix ../../"
+    "cz": "npm run cz --prefix ../../",
+    "commit": "npm run commit --prefix ../../"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
