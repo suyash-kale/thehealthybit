@@ -117,7 +117,7 @@ export const CheckInOtp: FC = () => {
         >
           <form onSubmit={handleSubmit(onSuccess, onError)} noValidate>
             <Grid container>
-              <Grid item md={12}>
+              <Grid item xs={12}>
                 <TextField
                   form={form}
                   registered='code'

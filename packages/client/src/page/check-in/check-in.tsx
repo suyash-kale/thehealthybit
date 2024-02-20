@@ -142,7 +142,7 @@ export const CheckIn: FC = () => {
             mobile: stringToBase64(data.mobile),
             password: stringToBase64(data.password),
           });
-          navigate('/otp', {
+          navigate('/check-in/otp', {
             state: data,
           });
         } catch (e: unknown) {
