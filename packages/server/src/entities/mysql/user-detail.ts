@@ -20,7 +20,7 @@ export class UserDetail extends BaseEntity {
   id: string;
 
   @Column('text')
-  first: string;
+  first?: string;
 
   @Column('text', { nullable: true })
   last?: string;
@@ -34,11 +34,13 @@ export class UserDetail extends BaseEntity {
   @Column('datetime')
   updatedAt: Date = new Date();
 
-  // encrypting mobile number before saving it in database.
+  // encrypting values before saving it in database.
   @BeforeInsert()
   @BeforeUpdate()
   beforeInsert() {
-    this.first = encrypt(this.first);
+    if (this.first) {
+      this.first = encrypt(this.first);
+    }
     if (this.last) {
       this.last = encrypt(this.last);
     }
@@ -47,10 +49,12 @@ export class UserDetail extends BaseEntity {
     }
   }
 
-  // decrypting mobile number after fetching it from database.
+  // decrypting values after fetching it from database.
   @AfterLoad()
   afterLoad() {
-    this.first = decrypt(this.first);
+    if (this.first) {
+      this.first = decrypt(this.first);
+    }
     if (this.last) {
       this.last = decrypt(this.last);
     }
@@ -60,7 +64,6 @@ export class UserDetail extends BaseEntity {
   }
 
   // relationships.
-
   @OneToOne(() => User, (user) => user.detail)
   @JoinColumn()
   user: User;
