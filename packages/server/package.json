@@ -11,7 +11,8 @@
     "prettier": "prettier ./src/ --check",
     "prettier-write": "prettier ./ --write",
     "build": "tsc --project tsconfig.json",
-    "cz": "npm run cz --prefix ../../"
+    "cz": "npm run cz --prefix ../../",
+    "commit": "npm run commit --prefix ../../"
   },
   "dependencies": {
     "@trpc/server": "^10.17.0",

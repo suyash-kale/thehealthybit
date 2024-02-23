@@ -8,6 +8,7 @@
     "prepare": "husky install",
     "start": "npm run start --prefix ./packages/server",
     "cz": "cz",
+    "commit": "aicommits --type conventional --generate 2",
     "lint": "lerna run lint",
     "prettier": "lerna run prettier",
     "semantic-release": "semantic-release"
