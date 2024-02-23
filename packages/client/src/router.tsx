@@ -1,13 +1,16 @@
 import React from 'react';
-import { useLocation, useRoutes } from 'react-router-dom';
+import { Outlet, useLocation, useRoutes } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
 import { MasterPage } from './template/master-page';
 import { RouterAnimation } from './atom/animation/router';
+import { Verify } from './page/verify';
 import { SignUp } from './page/sign-up';
 import { SignIn } from './page/sign-in';
 import { PageAuth } from './atom/page-auth';
 import { Dashboard } from './page/dashboard';
+
+const Empty = () => <Outlet />;
 
 export const Router = () => {
   const element = useRoutes([
@@ -19,9 +22,19 @@ export const Router = () => {
           path: 'sign-up',
           element: (
             <RouterAnimation>
-              <SignUp />
+              <Empty />
             </RouterAnimation>
           ),
+          children: [
+            {
+              path: '',
+              element: <SignUp />,
+            },
+            {
+              path: 'verify',
+              element: <Verify />,
+            },
+          ],
         },
         {
           path: 'sign-in',

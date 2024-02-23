@@ -22,7 +22,7 @@ export const App: FC = () => {
   // application will be ready once the lang's messages are loaded.
   useEffect(() => {
     const main = async () => {
-      const response = await fetch(`./locale/${locale}.json`);
+      const response = await fetch(`/locale/${locale}.json`);
       const data = await response.json();
       const intl = setIntl(locale, data);
       document.title = intl.formatMessage({ id: 'APP-NAME' });

@@ -13,11 +13,11 @@ export const ButtonAnimation: FC<ButtonAnimationProps> = ({ children }) => (
     variants={{
       hidden: {
         opacity: 0,
-        x: '-20px',
+        y: '20px',
       },
       visible: {
         opacity: 1,
-        x: '0px',
+        y: '0px',
         transition: {
           duration: 0.5,
         },

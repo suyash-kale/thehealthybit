@@ -2,6 +2,7 @@ import {
   AfterLoad,
   BaseEntity,
   BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   JoinColumn,
@@ -35,6 +36,7 @@ export class UserDetail extends BaseEntity {
 
   // encrypting mobile number before saving it in database.
   @BeforeInsert()
+  @BeforeUpdate()
   beforeInsert() {
     this.first = encrypt(this.first);
     if (this.last) {
