@@ -22,5 +22,7 @@
   "OTP": "One Time Password",
   "CODE": "Code",
   "INVALID-OTP": "The OTP is invalid.",
-  "INDIA": "India"
+  "INDIA": "India",
+  "MOBILE-NOT-EXIST": "The mobile number does not exist.",
+  "FORGOT-PASSWORD": "Forgot password"
 }

@@ -12,6 +12,9 @@ export const THEME = createTheme({
   },
   typography: {
     fontFamily: ENV.GOOGLE_FONT,
+    button: {
+      textTransform: 'none',
+    },
   },
   palette: {
     background: {
