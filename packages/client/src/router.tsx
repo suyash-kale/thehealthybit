@@ -8,6 +8,7 @@ import { CheckIn } from './page/check-in/check-in';
 import { CheckInOtp } from './page/check-in/otp';
 import { PageAuth } from './atom/page-auth';
 import { Dashboard } from './page/dashboard';
+import { ForgotPassword } from './page/check-in/forgot-password';
 
 const Empty = () => <Outlet />;
 
@@ -32,6 +33,10 @@ export const Router = () => {
             {
               path: 'otp',
               element: <CheckInOtp />,
+            },
+            {
+              path: 'forgot',
+              element: <ForgotPassword />,
             },
           ],
         },
