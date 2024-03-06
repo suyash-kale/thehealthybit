@@ -193,6 +193,11 @@ export const CheckIn: FC = () => {
           mobile,
         },
       });
+    const notExist = () =>
+      addNotification({
+        severity: 'warning',
+        message: 'MOBILE-NOT-EXIST',
+      });
     if (exist === null) {
       // need to check if the user exist.
       if (mobile) {
@@ -204,8 +209,11 @@ export const CheckIn: FC = () => {
             countryCode: stringToBase64(getValues('countryCode')),
             mobile: stringToBase64(mobile),
           });
-          setExist(response);
-          doNavigate();
+          if (response) {
+            doNavigate();
+          } else {
+            notExist();
+          }
         } catch (e: unknown) {
           setLoading(false);
         }
@@ -214,13 +222,9 @@ export const CheckIn: FC = () => {
         // submit the form for validation.
         onSubmit();
       }
-    }
-    if (exist === false) {
+    } else if (exist === false) {
       // if the user does not exist, show a warning message.
-      addNotification({
-        severity: 'warning',
-        message: 'MOBILE-NOT-EXIST',
-      });
+      notExist();
     } else if (exist === true) {
       // if the user exists, navigate to the forgot password page.
       doNavigate();
@@ -375,7 +379,7 @@ export const CheckIn: FC = () => {
           </form>
         </Paper>
         <Grid container justifyContent='center'>
-          <Button variant='text' size='small' onClick={onForgot}>
+          <Button variant='text' size='small' type='button' onClick={onForgot}>
             <FormattedMessage id='FORGOT-PASSWORD' />
           </Button>
         </Grid>
