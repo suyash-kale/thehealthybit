@@ -14,6 +14,7 @@ import {
   Grid,
   Paper,
   Typography,
+  Button,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
@@ -119,7 +120,7 @@ export const CheckIn: FC = () => {
     resolver: zodResolver(resolver),
   });
 
-  const { handleSubmit, setFocus, setValue } = form;
+  const { handleSubmit, setFocus, setValue, getValues } = form;
 
   // handle form submission.
   const onSuccess = useCallback(
@@ -132,6 +133,7 @@ export const CheckIn: FC = () => {
             mobile: stringToBase64(data.mobile),
           });
           setExist(response);
+          setLoading(false);
         } catch (e: unknown) {
           setLoading(false);
         }
@@ -140,8 +142,8 @@ export const CheckIn: FC = () => {
           await client.user.verify.mutate({
             countryCode: stringToBase64(data.countryCode),
             mobile: stringToBase64(data.mobile),
-            password: stringToBase64(data.password),
           });
+          setLoading(false);
           navigate('/check-in/otp', {
             state: data,
           });
@@ -156,16 +158,17 @@ export const CheckIn: FC = () => {
             password: stringToBase64(data.password),
           });
           signIn(response, rememberMe);
+          setLoading(false);
           navigate('/');
         } catch (e: unknown) {
+          setLoading(false);
           const id = (e as { message?: string })?.message;
           if (id === 'PASSWORD-INCORRECT') {
+            await wait(0);
             setFocus('password');
           }
-          setLoading(false);
         }
       }
-      setLoading(false);
     },
     [exist, signIn, rememberMe, navigate, setFocus],
   );
@@ -177,6 +180,66 @@ export const CheckIn: FC = () => {
       message: 'INVALID-FORM',
     });
   }, []);
+
+  const onSubmit = handleSubmit(onSuccess, onError);
+
+  // handle forgot password.
+  const onForgot = useCallback(async () => {
+    const mobile = getValues('mobile');
+    setLoading(true);
+    // navigate to the forgot password page.
+    const doNavigate = () => {
+      // sending the verification code to the user.
+      client.user.verify.mutate({
+        countryCode: stringToBase64(getValues('countryCode')),
+        mobile: stringToBase64(mobile),
+      });
+      // navigating to the forgot password form.
+      navigate('/check-in/forgot', {
+        state: {
+          countryCode: getValues('countryCode'),
+          mobile,
+        },
+      });
+    };
+    const notExist = () =>
+      addNotification({
+        severity: 'warning',
+        message: 'MOBILE-NOT-EXIST',
+      });
+    if (exist === null) {
+      // need to check if the user exist.
+      if (mobile) {
+        // mobile is available.
+        // checking if the mobile exists.
+        // and then navigate to the forgot password page.
+        try {
+          const response = await client.user.exist.mutate({
+            countryCode: stringToBase64(getValues('countryCode')),
+            mobile: stringToBase64(mobile),
+          });
+          if (response) {
+            doNavigate();
+          } else {
+            notExist();
+          }
+        } catch (e: unknown) {
+          setLoading(false);
+        }
+      } else {
+        // mobile is not available.
+        // submit the form for validation.
+        onSubmit();
+      }
+    } else if (exist === false) {
+      // if the user does not exist, show a warning message.
+      notExist();
+    } else if (exist === true) {
+      // if the user exists, navigate to the forgot password page.
+      doNavigate();
+    }
+    setLoading(false);
+  }, [onSubmit, exist, getValues, navigate, addNotification]);
 
   // handling remember me checkbox change event.
   const onChangeRememberMe = useCallback(
@@ -218,7 +281,7 @@ export const CheckIn: FC = () => {
             mb: 2,
           }}
         >
-          <form onSubmit={handleSubmit(onSuccess, onError)} noValidate>
+          <form onSubmit={onSubmit} noValidate>
             <Grid container>
               <Grid item md={3} xs={12} pr={{ md: 1 }} mb={{ xs: 2 }}>
                 <CountryCode onChange={onChangeCountry} />
@@ -324,6 +387,11 @@ export const CheckIn: FC = () => {
             </Grid>
           </form>
         </Paper>
+        <Grid container justifyContent='center'>
+          <Button variant='text' size='small' type='button' onClick={onForgot}>
+            <FormattedMessage id='FORGOT-PASSWORD' />
+          </Button>
+        </Grid>
       </Loading>
     </Grid>
   );

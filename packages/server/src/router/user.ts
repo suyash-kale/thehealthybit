@@ -40,11 +40,6 @@ export const userRouter = router({
       z.object({
         countryCode: z.string().min(1, { message: 'REQUIRED' }),
         mobile: z.string().min(1, { message: 'REQUIRED' }),
-        password: z
-          .string()
-          .min(1, { message: 'REQUIRED' })
-          .min(6, { message: 'TOO-SHORT' })
-          .max(20, { message: 'TOO-LONG' }),
       }),
     )
     .mutation<void>(async ({ input }) =>
@@ -60,16 +55,10 @@ export const userRouter = router({
               .string()
               .min(10, { message: 'INVALID-MOBILE' })
               .max(10, { message: 'INVALID-MOBILE' }),
-            password: z
-              .string()
-              .min(1, { message: 'REQUIRED' })
-              .min(6, { message: 'TOO-SHORT' })
-              .max(20, { message: 'TOO-LONG' }),
           })
           .parse({
             countryCode: base64ToString(input.countryCode),
             mobile: base64ToString(input.mobile),
-            password: base64ToString(input.password),
           }),
       ),
     ),
@@ -149,6 +138,48 @@ export const userRouter = router({
           .parse({
             countryCode: base64ToString(input.countryCode),
             mobile: base64ToString(input.mobile),
+            password: base64ToString(input.password),
+          }),
+      ),
+    ),
+
+  // forgot password for user.
+  forgot: procedurePubic
+    .input(
+      z.object({
+        countryCode: z.string().min(1, { message: 'REQUIRED' }),
+        mobile: z.string().min(1, { message: 'REQUIRED' }),
+        code: z.string().min(1, { message: 'REQUIRED' }),
+        password: z.string().min(1, { message: 'REQUIRED' }),
+      }),
+    )
+    .mutation<void>(async ({ input }) =>
+      userService.forgot(
+        z
+          .object({
+            countryCode: z
+              .string()
+              .min(1, { message: 'REQUIRED' })
+              .min(2, { message: 'INVALID-COUNTRY' })
+              .max(2, { message: 'INVALID-COUNTRY' }),
+            mobile: z
+              .string()
+              .min(10, { message: 'INVALID-MOBILE' })
+              .max(10, { message: 'INVALID-MOBILE' }),
+            code: z
+              .string()
+              .min(4, { message: 'INVALID-OTP' })
+              .max(4, { message: 'INVALID-OTP' }),
+            password: z
+              .string()
+              .min(1, { message: 'REQUIRED' })
+              .min(6, { message: 'TOO-SHORT' })
+              .max(20, { message: 'TOO-LONG' }),
+          })
+          .parse({
+            countryCode: base64ToString(input.countryCode),
+            mobile: base64ToString(input.mobile),
+            code: base64ToString(input.code),
             password: base64ToString(input.password),
           }),
       ),

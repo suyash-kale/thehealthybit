@@ -13,8 +13,8 @@ import { Loading } from '../../molecule/loading';
 import { useNotification } from '../../hooks/use-notification';
 import { stringToBase64 } from '../../utility/crypto';
 import { client } from '../../utility/trpc';
-import { useUser } from '../../hooks/use-user';
 import { ButtonAnimation } from '../../atom/animation/button';
+import { Password } from '../../molecule/password';
 import { wait } from '../../utility/wait';
 
 const schema = z.object({
@@ -28,22 +28,21 @@ const schema = z.object({
     .min(1, { message: 'REQUIRED' })
     .min(10, { message: 'INVALID-MOBILE' })
     .max(10, { message: 'INVALID-MOBILE' }),
+  code: z
+    .string()
+    .min(4, { message: 'INVALID-MOBILE' })
+    .max(4, { message: 'INVALID-MOBILE' }),
   password: z
     .string()
     .min(1, { message: 'REQUIRED' })
     .min(6, { message: 'TOO-SHORT' })
     .max(20, { message: 'TOO-LONG' }),
-  code: z
-    .string()
-    .min(4, { message: 'INVALID-MOBILE' })
-    .max(4, { message: 'INVALID-MOBILE' })
-    .optional(),
 });
 
 type SchemaType = z.infer<typeof schema>;
 
-// check in page component.
-export const CheckInOtp: FC = () => {
+// forgot password page component.
+export const ForgotPassword: FC = () => {
   const navigate = useNavigate();
 
   // data passed on from check in page.
@@ -54,38 +53,41 @@ export const CheckInOtp: FC = () => {
 
   const { addNotification } = useNotification();
 
-  const { signIn } = useUser();
-
   const form = useForm<SchemaType>({
     mode: 'onChange',
     reValidateMode: 'onChange',
     resolver: zodResolver(schema),
   });
 
-  const { handleSubmit, setFocus, setValue } = form;
+  const { handleSubmit, setValue, setFocus } = form;
 
   // handle form submission.
   const onSuccess = useCallback(
     async (data: SchemaType) => {
       setLoading(true);
       try {
-        const { countryCode, mobile, password, code } = data;
-        const response = await client.user.signUp.mutate({
-          countryCode: stringToBase64(countryCode),
-          mobile: stringToBase64(mobile),
-          password: stringToBase64(password),
-          code: stringToBase64(code),
+        await client.user.forgot.mutate({
+          countryCode: stringToBase64(data.countryCode),
+          mobile: stringToBase64(data.mobile),
+          code: stringToBase64(data.code),
+          password: stringToBase64(data.password),
         });
-        signIn(response, true);
+        addNotification({
+          severity: 'success',
+          message: 'PASSWORD-CHANGED',
+        });
         setLoading(false);
         navigate('/');
-      } catch (error) {
+      } catch (e: unknown) {
         setLoading(false);
-        await wait(0);
-        setFocus('code');
+        const id = (e as { message?: string })?.message;
+        if (id === 'INVALID-OTP') {
+          await wait(0);
+          setFocus('code');
+        }
       }
     },
-    [state, signIn, navigate, setFocus],
+    [state, navigate, addNotification, setFocus],
   );
 
   // handle form submission error.
@@ -101,7 +103,6 @@ export const CheckInOtp: FC = () => {
     if (state) {
       setValue('countryCode', state.countryCode);
       setValue('mobile', state.mobile);
-      setValue('password', state.password);
     } else {
       navigate('/');
     }
@@ -110,7 +111,7 @@ export const CheckInOtp: FC = () => {
   return (
     <Grid item xl={6} md={6} sm={12}>
       <Typography variant='h3' align='center' sx={{ mb: 3 }}>
-        <FormattedMessage id='OTP' />
+        <FormattedMessage id='FORGOT-PASSWORD' />
       </Typography>
       <Loading loading={loading}>
         <Paper
@@ -135,6 +136,22 @@ export const CheckInOtp: FC = () => {
                   type='number'
                   fullWidth
                   focus
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Password
+                  form={form}
+                  registered='password'
+                  loading={loading}
+                  formControl={{
+                    sx: {
+                      mb: 2,
+                    },
+                    required: true,
+                  }}
+                  label={'CREATE-PASSWORD'}
+                  placeholder={'CREATE-PASSWORD'}
+                  fullWidth
                 />
               </Grid>
               <Grid item xs={12} textAlign='right'>
