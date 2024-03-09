@@ -15,6 +15,7 @@ import { stringToBase64 } from '../../utility/crypto';
 import { client } from '../../utility/trpc';
 import { ButtonAnimation } from '../../atom/animation/button';
 import { Password } from '../../molecule/password';
+import { wait } from '../../utility/wait';
 
 const schema = z.object({
   countryCode: z
@@ -30,8 +31,7 @@ const schema = z.object({
   code: z
     .string()
     .min(4, { message: 'INVALID-MOBILE' })
-    .max(4, { message: 'INVALID-MOBILE' })
-    .optional(),
+    .max(4, { message: 'INVALID-MOBILE' }),
   password: z
     .string()
     .min(1, { message: 'REQUIRED' })
@@ -59,16 +59,35 @@ export const ForgotPassword: FC = () => {
     resolver: zodResolver(schema),
   });
 
-  const { handleSubmit, setValue } = form;
+  const { handleSubmit, setValue, setFocus } = form;
 
   // handle form submission.
   const onSuccess = useCallback(
     async (data: SchemaType) => {
-      console.log(data);
       setLoading(true);
-      // navigate('/');
+      try {
+        await client.user.forgot.mutate({
+          countryCode: stringToBase64(data.countryCode),
+          mobile: stringToBase64(data.mobile),
+          code: stringToBase64(data.code),
+          password: stringToBase64(data.password),
+        });
+        addNotification({
+          severity: 'success',
+          message: 'PASSWORD-CHANGED',
+        });
+        setLoading(false);
+        navigate('/');
+      } catch (e: unknown) {
+        setLoading(false);
+        const id = (e as { message?: string })?.message;
+        if (id === 'INVALID-OTP') {
+          await wait(0);
+          setFocus('code');
+        }
+      }
     },
-    [state, navigate],
+    [state, navigate, addNotification, setFocus],
   );
 
   // handle form submission error.

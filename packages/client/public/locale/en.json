@@ -24,5 +24,6 @@
   "INVALID-OTP": "The OTP is invalid.",
   "INDIA": "India",
   "MOBILE-NOT-EXIST": "The mobile number does not exist.",
-  "FORGOT-PASSWORD": "Forgot password"
+  "FORGOT-PASSWORD": "Forgot password",
+  "PASSWORD-CHANGED": "The password has been changed successfully."
 }

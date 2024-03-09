@@ -18,7 +18,6 @@ interface CheckInParams {
 interface VerifyParams {
   countryCode: string;
   mobile: string;
-  password: string;
 }
 
 interface SignUpParams {
@@ -31,6 +30,13 @@ interface SignUpParams {
 interface SignInParams {
   countryCode: string;
   mobile: string;
+  password: string;
+}
+
+export interface ForgotParams {
+  countryCode: string;
+  mobile: string;
+  code: string;
   password: string;
 }
 
@@ -57,13 +63,8 @@ class UserService {
   // verifying signing up requests.
   public async verify(data: VerifyParams): Promise<void> {
     const { countryCode, mobile } = data;
-    // validating user input data.
-    await this.validate(data);
-    // making sure the mobile is not already registered.
-    if (!(await this.exist(data))) {
-      // sending mobile OTP for verification.
-      await otp.send(countryCode + mobile, eOtpType.mobile);
-    }
+    // sending mobile OTP for verification.
+    await otp.send(countryCode + mobile, eOtpType.mobile);
   }
 
   // signing up new user once verified.
@@ -73,14 +74,7 @@ class UserService {
     // validating user input data.
     await this.validate(data);
 
-    // making sure the mobile is not already registered.
-    if (await this.exist(data)) {
-      throw new TRPCError({
-        code: 'PRECONDITION_FAILED',
-        message: 'MOBILE-ALREADY-REGISTERED',
-      });
-    }
-
+    // verifying mobile otp.
     await otp.verify(countryCode + mobile, code, eOtpType.mobile);
 
     // hashing password.
@@ -152,6 +146,34 @@ class UserService {
       mobile: user.mobile,
       authorization,
     };
+  }
+
+  // forgot password for user through otp verification.
+  public async forgot(data: ForgotParams): Promise<void> {
+    const { countryCode, mobile, code } = data;
+
+    // loading user with the mobile number.
+    const user = await User.findOne({
+      where: { countryCode: encrypt(countryCode), mobile: encrypt(mobile) },
+    });
+
+    // making sure the mobile is available.
+    if (!user) {
+      throw new TRPCError({
+        code: 'PRECONDITION_FAILED',
+        message: 'MOBILE-NOT-REGISTERED',
+      });
+    }
+
+    // verifying mobile OTP for verification.
+    await otp.verify(countryCode + mobile, code, eOtpType.mobile);
+
+    // hashing password.
+    const password = await bcryptjs.hash(data.password, ENV.SALT_LENGTH);
+
+    // updating user password.
+    user.password = password;
+    await user.save();
   }
 
   // validating user input data.

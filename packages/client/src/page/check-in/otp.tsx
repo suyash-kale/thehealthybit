@@ -15,6 +15,7 @@ import { stringToBase64 } from '../../utility/crypto';
 import { client } from '../../utility/trpc';
 import { useUser } from '../../hooks/use-user';
 import { ButtonAnimation } from '../../atom/animation/button';
+import { wait } from '../../utility/wait';
 
 const schema = z.object({
   countryCode: z
@@ -76,9 +77,12 @@ export const CheckInOtp: FC = () => {
           code: stringToBase64(code),
         });
         signIn(response, true);
+        setLoading(false);
         navigate('/');
       } catch (error) {
         setLoading(false);
+        await wait(0);
+        setFocus('code');
       }
     },
     [state, signIn, navigate, setFocus],

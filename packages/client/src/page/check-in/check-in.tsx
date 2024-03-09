@@ -133,6 +133,7 @@ export const CheckIn: FC = () => {
             mobile: stringToBase64(data.mobile),
           });
           setExist(response);
+          setLoading(false);
         } catch (e: unknown) {
           setLoading(false);
         }
@@ -141,8 +142,8 @@ export const CheckIn: FC = () => {
           await client.user.verify.mutate({
             countryCode: stringToBase64(data.countryCode),
             mobile: stringToBase64(data.mobile),
-            password: stringToBase64(data.password),
           });
+          setLoading(false);
           navigate('/check-in/otp', {
             state: data,
           });
@@ -157,16 +158,17 @@ export const CheckIn: FC = () => {
             password: stringToBase64(data.password),
           });
           signIn(response, rememberMe);
+          setLoading(false);
           navigate('/');
         } catch (e: unknown) {
+          setLoading(false);
           const id = (e as { message?: string })?.message;
           if (id === 'PASSWORD-INCORRECT') {
+            await wait(0);
             setFocus('password');
           }
-          setLoading(false);
         }
       }
-      setLoading(false);
     },
     [exist, signIn, rememberMe, navigate, setFocus],
   );
@@ -186,13 +188,20 @@ export const CheckIn: FC = () => {
     const mobile = getValues('mobile');
     setLoading(true);
     // navigate to the forgot password page.
-    const doNavigate = () =>
+    const doNavigate = () => {
+      // sending the verification code to the user.
+      client.user.verify.mutate({
+        countryCode: stringToBase64(getValues('countryCode')),
+        mobile: stringToBase64(mobile),
+      });
+      // navigating to the forgot password form.
       navigate('/check-in/forgot', {
         state: {
           countryCode: getValues('countryCode'),
           mobile,
         },
       });
+    };
     const notExist = () =>
       addNotification({
         severity: 'warning',
