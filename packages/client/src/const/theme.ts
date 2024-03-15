@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 import grey from '@mui/material/colors/grey';
-import primary from '@mui/material/colors/indigo';
+import primary from '@mui/material/colors/lightGreen';
 import secondary from '@mui/material/colors/amber';
 
 import { ENV } from './env';
@@ -8,7 +8,7 @@ import { ENV } from './env';
 // material theme configurations.
 export const THEME = createTheme({
   shape: {
-    borderRadius: 21,
+    borderRadius: 11,
   },
   typography: {
     fontFamily: ENV.GOOGLE_FONT,

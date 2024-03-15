@@ -6,7 +6,6 @@ import {
   Typography,
   Divider,
   List,
-  ListItem,
   ListItemIcon,
   ListItemText,
   Box,
@@ -16,12 +15,13 @@ import {
   MenuItem,
   AppBar,
   Drawer,
+  ListItemButton,
 } from '@mui/material';
 import { Theme, CSSObject, styled } from '@mui/material/styles';
 import {
   AccountCircle as AccountCircleIcon,
   Menu as MenuIcon,
-  Person as PersonIcon,
+  Restaurant as RestaurantIcon,
 } from '@mui/icons-material';
 import { FormattedMessage } from 'react-intl';
 
@@ -173,19 +173,21 @@ export const MasterPage: FC<MasterPageType> = () => {
           <Divider />
           <List>
             <Divider />
-            <ListItem>
+            <ListItemButton onClick={() => navigate('/meal-plan')}>
               <ListItemIcon>
-                <PersonIcon />
+                <RestaurantIcon />
               </ListItemIcon>
-              <ListItemText primary='Clients' />
-            </ListItem>
+              <ListItemText>
+                <FormattedMessage id='MEAL-PLAN' />
+              </ListItemText>
+            </ListItemButton>
             <Divider />
           </List>
         </DrawerStyled>
       )}
       <Box component='main' sx={{ flexGrow: 1, mt: 2, p: 3 }}>
         <DrawerHeader />
-        <Container>
+        <Container maxWidth={false}>
           <Grid container spacing={2} justifyContent='center'>
             {loading ? (
               <PageMessage title={<FormattedMessage id='RELAX' />}>
