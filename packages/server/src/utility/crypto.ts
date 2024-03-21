@@ -1,15 +1,11 @@
-import {
-  scryptSync,
-  randomBytes,
-  createCipheriv,
-  createDecipheriv,
-} from 'crypto';
+import { scryptSync, createCipheriv, createDecipheriv } from 'crypto';
 
 import { ENV } from './env';
 
 const algorithm = 'aes-256-ctr';
 const KEY = scryptSync(ENV.SECRET, 'salt', 32);
-const iv = randomBytes(16);
+
+const iv = Buffer.from(ENV.IV, 'hex');
 
 // encrypting plan text.
 export const encrypt = (text: string): string => {

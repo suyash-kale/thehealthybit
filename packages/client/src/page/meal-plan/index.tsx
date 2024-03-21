@@ -1,22 +1,27 @@
-import React, { FC } from 'react';
-import { Divider, Grid } from '@mui/material';
+import React, { FC, useEffect, useState } from 'react';
+import { Grid } from '@mui/material';
 
-import { MealType } from './meal-type';
+import { MealTypeDisplay } from './meal-type';
 import { AddMealType } from './add-meal-type';
 import { DateHead } from './date-head';
 import { DayMeal } from './meal';
+import { client } from '../../utility/trpc';
+import { getWeek } from '../../utility/date';
+import { MealType } from '../../types/meal-type';
 
 export const MealPlan: FC = () => {
-  const days = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ];
-  const meals = ['Breakfast', 'Lunch', 'Dinner'];
+  const [mealType, setMealType] = useState<Array<MealType>>([]);
+
+  const week = getWeek();
+
+  useEffect(() => {
+    const main = async () => {
+      const response = await client.mealType.read.query();
+      setMealType(response);
+    };
+    main();
+  }, []);
+
   return (
     <Grid
       style={{
@@ -27,22 +32,34 @@ export const MealPlan: FC = () => {
       <Grid container>
         <Grid style={{ width: '50px', textAlign: 'center' }} item>
           <div style={{ height: '52px' }}></div>
-          <Divider flexItem />
           <Grid direction='column' height='100%' mt={1} container>
-            {meals.map((meal) => (
-              <MealType key={meal} meal={meal} xs={12 / meals.length} />
+            {mealType.map((meal) => (
+              <MealTypeDisplay
+                key={meal.id}
+                meal={meal}
+                xs={12 / mealType.length}
+              />
             ))}
           </Grid>
           <AddMealType />
         </Grid>
         <Grid style={{ width: 'calc(100% - 50px)' }} item>
           <Grid style={{ height: '100%' }} container>
-            {days.map((day) => (
-              <Grid key={day} xs={12 / days.length} textAlign='center' item>
-                <DateHead day={day} />
+            {week.map((date) => (
+              <Grid
+                key={date.getTime()}
+                xs={12 / week.length}
+                textAlign='center'
+                item
+              >
+                <DateHead date={date} />
                 <Grid direction='column' height='100%' mt={1} container>
-                  {meals.map((meal) => (
-                    <DayMeal key={meal} meal={meal} xs={12 / meals.length} />
+                  {mealType.map((meal) => (
+                    <DayMeal
+                      key={meal.id}
+                      meal={meal}
+                      xs={12 / mealType.length}
+                    />
                   ))}
                 </Grid>
               </Grid>

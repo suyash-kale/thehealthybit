@@ -8,7 +8,7 @@ import { ENV } from './env';
 // material theme configurations.
 export const THEME = createTheme({
   shape: {
-    borderRadius: 11,
+    borderRadius: 4,
   },
   typography: {
     fontFamily: ENV.GOOGLE_FONT,
