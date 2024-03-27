@@ -25,5 +25,6 @@
   "INDIA": "India",
   "MOBILE-NOT-EXIST": "The mobile number does not exist.",
   "FORGOT-PASSWORD": "Forgot password",
-  "PASSWORD-CHANGED": "The password has been changed successfully."
+  "PASSWORD-CHANGED": "The password has been changed successfully.",
+  "MEAL-PLAN": "Meal plan"
 }
