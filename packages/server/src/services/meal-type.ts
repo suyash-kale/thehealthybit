@@ -35,20 +35,15 @@ class MealTypeService {
     return await mealType.save();
   }
 
-  public async read(data: ReadParams): Promise<Array<MealType>> {
-    const user = await User.findOne({
-      where: { id: data.user.id },
-      relations: ['mealType'],
-      order: {
-        mealType: {
-          start: 'ASC',
+  public async read({ user }: ReadParams): Promise<Array<MealType>> {
+    return await MealType.find({
+      relations: ['user'],
+      where: {
+        user: {
+          id: user.id,
         },
       },
     });
-    if (!user) {
-      return [];
-    }
-    return user.mealType;
   }
 }
 

@@ -105,9 +105,15 @@ class UserService {
         user,
       }),
       mealTypeService.create({
+        label: 'Snack',
+        start: 17,
+        end: 19,
+        user,
+      }),
+      mealTypeService.create({
         label: 'Dinner',
-        start: 19,
-        end: 21,
+        start: 20,
+        end: 22,
         user,
       }),
     ]);
