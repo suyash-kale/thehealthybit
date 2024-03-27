@@ -7,10 +7,12 @@ import { ENV } from './utility/env';
 import { initialize } from './utility/data-source';
 import { router, createContext } from './utility/trpc';
 import { userRouter } from './router/user';
+import { mealTypeRouter } from './router/meal-type';
 
 // application routers.
 const appRouter = router({
   user: userRouter,
+  mealType: mealTypeRouter,
 });
 
 export type AppRouter = typeof appRouter;
