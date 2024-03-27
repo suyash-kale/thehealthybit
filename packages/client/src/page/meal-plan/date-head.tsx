@@ -1,28 +1,17 @@
 import React, { FC } from 'react';
 import { Divider, Typography } from '@mui/material';
 
+import { formatDate, formatDay } from '../../utility/date';
+
 interface DateProps {
   date: Date;
 }
 
 export const DateHead: FC<DateProps> = ({ date }) => {
-  const day = date.getDate();
-  const month = date.toLocaleString('default', { month: 'short' });
-  const year = date.toLocaleString('default', { year: '2-digit' });
-  const days = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
-
   return (
     <>
-      <Typography variant='h6'>{days[date.getDay()]}</Typography>
-      <Typography variant='body2'>{`${day} ${month} ${year}`}</Typography>
+      <Typography variant='h6'>{formatDay(date)}</Typography>
+      <Typography variant='body2'>{formatDate(date)}</Typography>
       <Divider flexItem />
     </>
   );

@@ -1,26 +1,28 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import { Grid } from '@mui/material';
+import { FormattedMessage } from 'react-intl';
+import { useRecoilValue } from 'recoil';
 
+import { MealTypeState } from '../../state/meal-type';
+import { PageMessage } from '../../atom/page-message';
+import { getWeek } from '../../utility/date';
 import { MealTypeDisplay } from './meal-type';
 import { AddMealType } from './add-meal-type';
 import { DateHead } from './date-head';
 import { DayMeal } from './meal';
-import { client } from '../../utility/trpc';
-import { getWeek } from '../../utility/date';
-import { MealType } from '../../types/meal-type';
 
 export const MealPlan: FC = () => {
-  const [mealType, setMealType] = useState<Array<MealType>>([]);
+  const mealType = useRecoilValue(MealTypeState);
 
   const week = getWeek();
 
-  useEffect(() => {
-    const main = async () => {
-      const response = await client.mealType.read.query();
-      setMealType(response);
-    };
-    main();
-  }, []);
+  if (mealType.length === 0) {
+    return (
+      <PageMessage title={<FormattedMessage id='RELAX' />} loading>
+        <FormattedMessage id='WE-ARE-GETTING-THINGS-READY' />
+      </PageMessage>
+    );
+  }
 
   return (
     <Grid
@@ -57,7 +59,8 @@ export const MealPlan: FC = () => {
                   {mealType.map((meal) => (
                     <DayMeal
                       key={meal.id}
-                      meal={meal}
+                      date={date}
+                      mealType={meal}
                       xs={12 / mealType.length}
                     />
                   ))}
