@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs';
 import { TRPCError } from '@trpc/server';
 
 import { ENV } from '../utility/env';
+import { SessionUserType } from '../types';
 import { User } from '../entities/mysql/user';
 import { UserDetail } from '../entities/mysql/user-detail';
 import { sign, verify } from '../utility/jwt';
@@ -9,6 +10,7 @@ import { userDetailService } from './user-detail';
 import { eOtpType } from '../entities/mongodb/otp';
 import otp from '../utility/otp';
 import { encrypt } from '../utility/crypto';
+import { mealTypeService } from './meal-type';
 
 interface CheckInParams {
   countryCode: string;
@@ -44,10 +46,6 @@ export interface ForgotParams {
 export interface UserType {
   mobile: User['mobile'];
   authorization: string;
-}
-
-interface SessionUserType extends Record<string, unknown> {
-  id: User['id'];
 }
 
 class UserService {
@@ -92,8 +90,30 @@ class UserService {
     userDetail.user = user;
     await userDetailService.create(userDetail);
 
+    // adding default meal types for the user.
+    await Promise.all([
+      mealTypeService.create({
+        label: 'Breakfast',
+        start: 8,
+        end: 10,
+        user,
+      }),
+      mealTypeService.create({
+        label: 'Lunch',
+        start: 12,
+        end: 14,
+        user,
+      }),
+      mealTypeService.create({
+        label: 'Dinner',
+        start: 19,
+        end: 21,
+        user,
+      }),
+    ]);
+
     // returning signed up user information.
-    return this.me({ id: user.id });
+    return this.me(user);
   }
 
   // signing in user through mobile and password.
@@ -124,23 +144,16 @@ class UserService {
     }
 
     // returning signed in user information.
-    return this.me({ id: user.id });
+    return this.me(user);
   }
 
   // get user information from session authorization token.
-  public async me(data: SessionUserType): Promise<UserType> {
-    const { id } = data;
-
-    const user = await User.findOne({
-      where: { id },
-      relations: ['detail'],
-    });
-
+  public async me(user: User): Promise<UserType> {
     if (!user) {
       throw new Error();
     }
 
-    const authorization = this.getAuthorization(data);
+    const authorization = this.getAuthorization({ id: user.id });
 
     return {
       mobile: user.mobile,
@@ -198,10 +211,11 @@ class UserService {
   }
 
   // decoding authorization token for user session.
-  public decodeAuthorization(
+  public async decodeAuthorization(
     authorization: UserType['authorization'],
-  ): Promise<SessionUserType> {
-    return verify<SessionUserType>(authorization);
+  ): Promise<null | User> {
+    const { id } = await verify<SessionUserType>(authorization);
+    return await User.findOne({ where: { id } });
   }
 }
 

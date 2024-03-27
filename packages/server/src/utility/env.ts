@@ -10,4 +10,5 @@ export const ENV = {
   SECRET: process.env.SECRET as string,
   MONGODB_URL: process.env.MONGODB_URL as string,
   SMS_AUTH_KEY: process.env.SMS_AUTH_KEY as string,
+  IV: process.env.IV as string,
 };

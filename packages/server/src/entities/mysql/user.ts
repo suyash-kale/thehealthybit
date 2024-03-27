@@ -5,6 +5,7 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   Relation,
@@ -12,6 +13,7 @@ import {
 
 import { encrypt, decrypt } from '../../utility/crypto';
 import { UserDetail } from './user-detail';
+import { MealType } from './meal-type';
 
 // base user information.
 @Entity()
@@ -55,4 +57,7 @@ export class User extends BaseEntity {
   // relationships.
   @OneToOne(() => UserDetail, (userDetail) => userDetail.user)
   detail: Relation<UserDetail>;
+
+  @OneToMany(() => MealType, (mealType) => mealType.user)
+  mealType: Array<MealType>;
 }
