@@ -97,7 +97,7 @@ export const MasterPage: FC<MasterPageType> = () => {
 
   const [open, setOpen] = React.useState(true);
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(!isSignIn);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
